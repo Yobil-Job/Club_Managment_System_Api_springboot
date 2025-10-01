@@ -12,7 +12,6 @@ import com.club.api.club_managment_api.dtos.clubs.RequestClubDto;
 import com.club.api.club_managment_api.dtos.clubs.RequestClubDtoFull;
 import com.club.api.club_managment_api.dtos.clubs.ResponseClubDto;
 import com.club.api.club_managment_api.dtos.student.StudentResponseDto;
-import com.club.api.club_managment_api.dtos.student.StudentResponseDtoFull;
 import com.club.api.club_managment_api.exceptions.DuplicateResourceException;
 import com.club.api.club_managment_api.exceptions.ResourceAlreadyFoundException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
@@ -142,7 +141,7 @@ public class ClubService {
 
 	}
 
-	public boolean getMemberExistanseByStudentId(int clubId, int studentId) {
+	public boolean getMemberExistanseByStudentId(int clubId, long studentId) {
 		studentService.getStudentById(studentId);
 		Club c = getClubByIdEntity(clubId);
 		return c.getMembers().stream().anyMatch(student -> student.getId() == studentId);
@@ -161,7 +160,7 @@ public class ClubService {
 	}
 
 
-	public Club assignAuthority(int clubId, int studentId, Authority authority) {
+	public Club assignAuthority(int clubId, long studentId, Authority authority) {
 		if (!getMemberExistanseByStudentId(clubId, studentId)) {
 			throw new resourceNotFoundException(
 					"student must be member of a club to get Authority " + studentId + " " + clubId);

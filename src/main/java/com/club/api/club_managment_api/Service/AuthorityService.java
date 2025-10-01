@@ -31,7 +31,7 @@ public class AuthorityService {
 		this.studentService = studentService;
 	}
 
-	public Authority createAuthority(int clubId, int studentId, String roleName,LocalDate startDate,LocalDate endDate) {
+	public Authority createAuthority(int clubId, long studentId, String roleName,LocalDate startDate,LocalDate endDate) {
 		Authority a = new Authority();
 		Club c = clubService.getClubByIdEntity(clubId);
 		Student s = studentService.getStudentByIdEntity(studentId);
