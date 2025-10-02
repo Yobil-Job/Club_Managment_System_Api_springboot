@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.club.api.club_managment_api.models.enums.Club_Type_enum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,6 +31,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Clubs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Club {		
 
 

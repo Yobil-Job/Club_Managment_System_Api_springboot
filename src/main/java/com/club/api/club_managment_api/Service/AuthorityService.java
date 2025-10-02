@@ -48,9 +48,10 @@ public class AuthorityService {
 		a.setStartDate(startDate);
 		a.setEndDate(endDate);
 		s.setRole(Role_enum.SUPER_USER);
-		clubService.assignAuthority(clubId, studentId, a);
+		//clubService.assignAuthority(clubId, studentId, a);
+		Authority saved =authorityRepository.save(a);
 		
-		return 	a;
+		return 	saved;
 		
 		
            
@@ -89,7 +90,7 @@ public class AuthorityService {
 		return authorityRepository.findByClub(c);
 	}
 
-	public List<Authority> getAuthoritiesByStudent(int studentId) {
+	public List<Authority> getAuthoritiesByStudent(long studentId) {
 		Student s = studentService.getStudentByIdEntity(studentId);
 		return authorityRepository.findByStudent(s);
 	}

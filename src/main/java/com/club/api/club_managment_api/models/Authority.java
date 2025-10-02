@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,10 +34,12 @@ public class Authority {
 	
 	@ManyToOne
 	@JoinColumn(name = "student_id")
+	@JsonIgnore
 	private Student student;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "club_id",nullable = false)
+    @JsonIgnore
 	private Club club;
 	
 	@Column

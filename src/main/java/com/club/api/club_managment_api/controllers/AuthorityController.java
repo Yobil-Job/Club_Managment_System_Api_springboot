@@ -4,9 +4,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.net.URI;
+import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,10 +36,7 @@ public class AuthorityController {
 	private final StudentClubRepository studentClubRepository;
 	private final StudentRepository studentRepository;
 	
-	
-	
-	
-	
+
 	public AuthorityController(AuthorityService authorityService,ClubRepository clubRepository, StudentClubRepository studentClubRepository,StudentRepository studentRepository) {
 		super();
 		this.authorityService=authorityService;
@@ -44,14 +44,15 @@ public class AuthorityController {
 		this.studentClubRepository = studentClubRepository;
 		this.studentRepository=studentRepository;
 	}
+	
 
 	@PostMapping("/{clubAdminId}/create")
-	public ResponseEntity<EntityModel<Authority>> createAuthority(@Valid @RequestBody RequestAuthorityDto dto,@PathVariable long clubAdminID) {
+	public ResponseEntity<EntityModel<Authority>> createAuthority(@Valid @RequestBody RequestAuthorityDto dto,@PathVariable int clubAdminId) {
 		
 		int clubId=dto.getClubId();
 		Club c=clubRepository.findById(clubId).orElseThrow(()-> new resourceNotFoundException("club not foun clubId:"));
 		
-		if(c.getClubAdminId()!=clubAdminID) {
+		if(c.getClubAdminId()!=clubAdminId) {
 			throw new resourceNotFoundException("To assign authority to the club you must be club Admin");
 		}
 		else {
@@ -63,9 +64,9 @@ public class AuthorityController {
 				 
 				Authority result=authorityService.createAuthority(clubId, studentId,dto.getName(),dto.getStartDate(),dto.getEndDate());
 				EntityModel<Authority> response=EntityModel.of(result,
-						linkTo(methodOn(AuthorityController.class).retriveAuthorityById()).withSelfRel());
+						linkTo(methodOn(AuthorityController.class).retriveAuthorityById(result.getId())).withSelfRel());
 				
-				URI location=linkTo(methodOn(AuthorityController.class).retriveAuthorityById()).toUri();
+				URI location=linkTo(methodOn(AuthorityController.class).retriveAuthorityById(result.getId())).toUri();
 				
 				return ResponseEntity.created(location).body(response);
 				
@@ -78,25 +79,57 @@ public class AuthorityController {
 		
 		
 	}
+	@GetMapping("/{id}")
+	public ResponseEntity<EntityModel<Authority>> retriveAuthorityById(@PathVariable int id) {
+	    Authority authority = authorityService.getAuthorityById(id) ;
+	            
 
-	private Class<?> retriveAuthorityById() {
-		// TODO Auto-generated method stub
-		return null;
+	    EntityModel<Authority> resource = EntityModel.of(
+	            authority,
+	            linkTo(methodOn(AuthorityController.class).retriveAuthorityById(id)).withSelfRel()
+	            
+	    );
+
+	    return ResponseEntity.ok(resource);
 	}
-
+	
+	@GetMapping("/clubs/{clubId}")
+	public ResponseEntity<CollectionModel<EntityModel<Authority>>>  getAuthoritiesByClub(@PathVariable int clubId) {
+		List<Authority> authorities=authorityService.getAuthoritiesByClub(clubId);
+		List<EntityModel<Authority>> e=authorities.stream().map(a->EntityModel.of(a,
+				linkTo(methodOn(AuthorityController.class).retriveAuthorityById(a.getId())).withSelfRel())).toList();
+		
+		CollectionModel<EntityModel<Authority>> response=CollectionModel.of(e,
+				linkTo(methodOn(AuthorityController.class).getAuthoritiesByClub(clubId)).withSelfRel());
+		return ResponseEntity.ok(response);
+		
+		
+	}
+	
+	@GetMapping("/students/{studentId}")
+	public ResponseEntity<CollectionModel<EntityModel<Authority>>> getAuthoritiesByStudent(@PathVariable long studentId) {
+		List<Authority> authorities= authorityService.getAuthoritiesByStudent(studentId);
+		List<EntityModel<Authority>> e=authorities.stream().map(a->EntityModel.of(a,
+				linkTo(methodOn(AuthorityController.class).retriveAuthorityById(a.getId())).withSelfRel())).toList();
+		
+		CollectionModel<EntityModel<Authority>> response=CollectionModel.of(e,
+				linkTo(methodOn(AuthorityController.class).getAuthoritiesByStudent(studentId)).withSelfRel());
+		return ResponseEntity.ok(response);
+		
+		
+	}
 }
 
 
 /*
  * 6. AuthorityController
  * 
- * POST /api/clubs/{clubId}/authorities/{studentId} → assignAuthority
+
  * 
  * DELETE /api/authorities/{id} → removeAuthority
  * 
- * GET /api/authorities/{id} → getAuthorityById
+
  * 
- * GET /api/clubs/{clubId}/authorities → getAuthoritiesByClub
  * 
  * GET /api/students/{studentId}/authorities → getAuthoritiesByStudent
  * 
