@@ -6,12 +6,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.club.api.club_managment_api.exceptions.DuplicateResourceException;
+import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Authority;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Student;
 import com.club.api.club_managment_api.models.enums.Role_enum;
 import com.club.api.club_managment_api.repository.AuthorityRepository;
+import com.club.api.club_managment_api.repository.StudentClubRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -22,13 +24,15 @@ public class AuthorityService {
 	private final AuthorityRepository authorityRepository;
 	private final ClubService clubService;
 	private final StudentService studentService;
+	private final StudentClubRepository studentClubRepository;
 
 	public AuthorityService(AuthorityRepository authorityRepository, ClubService clubService,
-			StudentService studentService) {
+			StudentService studentService,StudentClubRepository studentClubRepository) {
 		super();
 		this.authorityRepository = authorityRepository;
 		this.clubService = clubService;
 		this.studentService = studentService;
+		this.studentClubRepository=studentClubRepository;
 	}
 
 	public Authority createAuthority(int clubId, long studentId, String roleName,LocalDate startDate,LocalDate endDate) {
@@ -99,26 +103,49 @@ public class AuthorityService {
 		return authorityRepository.findAll();
 	}
 
-	public void removeAuthority(int authorityId, int clubId) {
-		Authority a = getAuthorityById(authorityId);
-		clubService.removeAuthority(clubId, a) ;
-			authorityRepository.delete(a);
+	public void removeAuthority(int authorityId, int clubId,int clubAdminId) {
+		Club c=clubService.getClubByIdEntity(clubId);
+		if(c.getClubAdminId()!=clubAdminId) {
+			throw new notAuthorizedUserException("You are not authorized to delete authority clubAdminId:"+clubAdminId);
+		}
+		else {
+			Authority a = getAuthorityById(authorityId);
+			clubService.removeAuthority(clubId, a) ;
+		
+			if(authorityRepository.findById(authorityId)!=null) {
+				authorityRepository.delete(a);
+			}
+		}
+		
+		
+		
+			
 
 	}
 
-	public Authority updateAuthority(int authorityId, String newName, int StudentId, int clubId,LocalDate startDate,LocalDate endDate) {
+	public Authority updateAuthority(int authorityId, String newName, long StudentId, int clubId,LocalDate startDate,LocalDate endDate) {
 
-		Student s = studentService.getStudentByIdEntity(StudentId);
-		Club c = clubService.getClubByIdEntity(clubId);
+		
 		Authority a = getAuthorityById(authorityId);
-		if (c.getAuthorities().stream().anyMatch(auth -> auth.getName().equalsIgnoreCase(newName))) {
-			throw new DuplicateResourceException("Authority with name :" + newName + " already found");
+		if(StudentId!=0) {
+			Student s = studentService.getStudentByIdEntity(StudentId);
+			if(!studentClubRepository.isApprovedMemberOfClub(StudentId, clubId)) {
+				throw new resourceNotFoundException("The student should be approved member of the club studentId:"+StudentId);
+			}
+			else {
+				a.setStudent(s);	
+			}
+			
+			
+			
 		}
-		a.setName(newName);
-		a.setStudent(s);
-		a.setStartDate(startDate);
-		a.setEndDate(endDate);
-		return authorityRepository.save(a);
+		
+		if(newName!=null) {a.setName(newName);}
+		if(startDate!=null) {a.setStartDate(startDate);}
+		if(endDate!=null) {a.setEndDate(endDate);}
+		
+		 Authority saved=authorityRepository.save(a);
+		return saved;
 
 	}
 

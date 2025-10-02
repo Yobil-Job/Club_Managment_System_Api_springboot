@@ -9,7 +9,9 @@ import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.club.api.club_managment_api.Service.AuthorityService;
 import com.club.api.club_managment_api.dtos.authorities.RequestAuthorityDto;
+import com.club.api.club_managment_api.dtos.authorities.RequestAuthorityUpdateDto;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Authority;
 import com.club.api.club_managment_api.models.Club;
@@ -34,15 +37,15 @@ public class AuthorityController {
 	private final AuthorityService authorityService;
 	private final ClubRepository clubRepository;
 	private final StudentClubRepository studentClubRepository;
-	private final StudentRepository studentRepository;
+	
 	
 
-	public AuthorityController(AuthorityService authorityService,ClubRepository clubRepository, StudentClubRepository studentClubRepository,StudentRepository studentRepository) {
+	public AuthorityController(AuthorityService authorityService,ClubRepository clubRepository, StudentClubRepository studentClubRepository) {
 		super();
 		this.authorityService=authorityService;
 		this.clubRepository = clubRepository;
 		this.studentClubRepository = studentClubRepository;
-		this.studentRepository=studentRepository;
+		
 	}
 	
 
@@ -118,20 +121,21 @@ public class AuthorityController {
 		
 		
 	}
+	
+	@PatchMapping("/{authorityId}/update/{clubAdminId}")
+	public Authority updateAuthority(@PathVariable int authorityId,@PathVariable int clubAdminId,@RequestBody RequestAuthorityUpdateDto dto) {
+		
+		return authorityService.updateAuthority(authorityId, dto.getName(), dto.getStudentId(), dto.getClubId(), dto.getStartDate(), dto.getEndDate());
+		
+		
+	}
+	
+	@DeleteMapping("/{authorityId}/delete/{clubId}/{clubAdminId}")
+	public String removeAuthority(@PathVariable int authorityId,@PathVariable int clubId,@PathVariable int clubAdminId) {
+		
+		authorityService.removeAuthority(authorityId, clubId, clubAdminId);
+		return "deleted succesfully";
+	}
 }
 
 
-/*
- * 6. AuthorityController
- * 
-
- * 
- * DELETE /api/authorities/{id} → removeAuthority
- * 
-
- * 
- * 
- * GET /api/students/{studentId}/authorities → getAuthoritiesByStudent
- * 
- * PUT /api/authorities/{id} → updateAuthority
- */
