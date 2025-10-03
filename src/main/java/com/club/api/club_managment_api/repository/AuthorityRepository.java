@@ -14,5 +14,7 @@ public interface AuthorityRepository extends JpaRepository<Authority, Integer>{
 
 	public List<Authority> findByClub(Club c);
 	public List<Authority> findByStudent(Student s);
+	
+	boolean existsByStudentIdAndClubId(Long studentId, Integer clubId);
 }
  

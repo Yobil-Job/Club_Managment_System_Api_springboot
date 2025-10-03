@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,6 +29,7 @@ public class Announcement {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "club_id",nullable = false)
+	@JsonIgnore
 	private Club club;
 	
 	@NotBlank
