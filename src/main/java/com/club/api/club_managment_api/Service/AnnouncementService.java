@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.club.api.club_managment_api.dtos.announcement.RequestAnnouncementDto;
+import com.club.api.club_managment_api.dtos.announcement.RequestAnnouncementUpdateDto;
 import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Announcement;
@@ -124,26 +125,46 @@ public class AnnouncementService {
 	  return announcementRepository.findAll();
 	}
 	
-	public Announcement updateAnnouncement(int announcementId, Announcement updated,int studentId,int clubId) {
-		if(!checkPortalAdminAccess(studentId, clubId)) {
-			throw new notAuthorizedUserException("Not authorized s:"+studentId);
+	public Announcement updateAnnouncement(int announcementId, RequestAnnouncementUpdateDto dto) {
+		 
+		Announcement a=announcementRepository.findById(announcementId).orElseThrow(
+			()->	new resourceNotFoundException("No announcement found with id :"+announcementId));
+		
+		if(a.getCreatedBy().getId()!=dto.getCreatedById()) {
+			throw new notAuthorizedUserException("Only authorty who created the announcement can edit it");
+		}else {
+			if(dto.getTitle()!=null) {a.setTitle(dto.getTitle());}
+			if(dto.getDescription()!=null) {a.setDescription(dto.getDescription());}
+			if(dto.getClubId()!=0) {
+				if(!authorityRepository.existsByStudentIdAndClubId(dto.getCreatedById(), dto.getClubId())) {
+					throw new notAuthorizedUserException("Wring club id :"+dto.getClubId());
+				}else {
+					a.setClub(clubRepository.findById(dto.getClubId()).orElseThrow(()->new resourceNotFoundException("no club witth id :"+dto.getClubId()+" found")));
+				}
+			}
+			
 		}
-		
-		Announcement a=getAnnouncementById(announcementId);
-		a.setTitle(updated.getTitle());
-		a.setDescription(updated.getDescription());
-		return announcementRepository.save(a);
-		
+		Announcement saved=announcementRepository.save(a);
+		return saved;
 	} 
 	
-	public void deleteAnnouncement(int announcementId, int requesterId,int clubId) {
-		if(!checkPortalAdminAccess(requesterId, clubId)) 
-			{
-				throw new notAuthorizedUserException("Not authorized s:"+requesterId);
-			}
+	public void deleteAnnouncement(int announcementId, long requesterId) {
 		
-		Announcement a=getAnnouncementById(announcementId);
-		announcementRepository.delete(a);
+		Announcement a=announcementRepository.findById(announcementId).orElseThrow(
+				()->new resourceNotFoundException("Announcement with id :"+announcementId+" not found"));
+		if(a.getCreatedBy().getId()!=requesterId) {
+			throw new notAuthorizedUserException("Only the creater of the announcement can delete the announcement");
+		}
+		else {
+			announcementRepository.deleteById(announcementId);
+		}
+		/*
+		 * if(!checkPortalAdminAccess(requesterId, clubId)) { throw new
+		 * notAuthorizedUserException("Not authorized s:"+requesterId); }
+		 * 
+		 * Announcement a=getAnnouncementById(announcementId);
+		 * announcementRepository.delete(a);
+		 */
 		
 	}
 	

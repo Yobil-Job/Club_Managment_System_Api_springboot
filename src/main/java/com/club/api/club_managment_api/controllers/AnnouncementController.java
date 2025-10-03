@@ -11,7 +11,10 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.core.LinkBuilderSupport;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.club.api.club_managment_api.Service.AnnouncementService;
 import com.club.api.club_managment_api.dtos.announcement.RequestAnnouncementDto;
+import com.club.api.club_managment_api.dtos.announcement.RequestAnnouncementUpdateDto;
 import com.club.api.club_managment_api.models.Announcement;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/announcements")
@@ -36,7 +42,7 @@ public class AnnouncementController {
 
 
 	@PostMapping("/create")
-	public ResponseEntity<EntityModel<Announcement>> createAnnouncement(@RequestBody RequestAnnouncementDto dto) {
+	public ResponseEntity<EntityModel<Announcement>> createAnnouncement(@Valid @RequestBody RequestAnnouncementDto dto) {
 		
 		  Announcement a=announcementService.createAnnouncement(dto);
 		  EntityModel<Announcement> e= EntityModel.of(a,
@@ -70,18 +76,23 @@ public class AnnouncementController {
 	}
 
 
+    @PatchMapping("/{announcementId}/update")
+    private Announcement updateAnnouncement(@Valid @RequestBody RequestAnnouncementUpdateDto dto ,@PathVariable int announcementId) {
+    	
+    	       return announcementService.updateAnnouncement(announcementId, dto);
+			
+	}
 
-	private LinkBuilderSupport<WebMvcLinkBuilder> deleteAnnouncement() {
-		// TODO Auto-generated method stub
+    @DeleteMapping("/{announcementId}/{creaatedById}")
+	private void deleteAnnouncement(@PathVariable int announcementId,@PathVariable long creaatedById  ) {
+    	
+		
 		return null;
 	}
 
 
 
-	private LinkBuilderSupport<WebMvcLinkBuilder> updateAnnouncement() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 
 
