@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.core.LinkBuilderSupport;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,8 +45,7 @@ public class AnnouncementController {
 		  Announcement a=announcementService.createAnnouncement(dto);
 		  EntityModel<Announcement> e= EntityModel.of(a,
 				  linkTo(methodOn(AnnouncementController.class).retriveAnnouncementById(a.getId())).withSelfRel(),
-				  linkTo(methodOn(AnnouncementController.class).updateAnnouncement()).withRel("update"),
-				  linkTo(methodOn(AnnouncementController.class).deleteAnnouncement()).withRel("delete"));
+				  linkTo(methodOn(AnnouncementController.class).deleteAnnouncement(a.getId(),a.getCreatedBy().getId())).withRel("delete"));
 		  
 		  URI location =linkTo(methodOn(AnnouncementController.class).retriveAnnouncementById(a.getId())).toUri();
 		  return ResponseEntity.created(location).body(e);
@@ -56,16 +53,22 @@ public class AnnouncementController {
 	}
 	
 	@GetMapping("/{id}")
-	private ResponseEntity<EntityModel<Announcement>> retriveAnnouncementById(int id) {
+	public ResponseEntity<EntityModel<Announcement>> retriveAnnouncementById(@PathVariable int id) {
 		Announcement a=announcementService.getAnnouncementById(id);
 		EntityModel<Announcement> e=EntityModel.of(a,
 				linkTo(methodOn(AnnouncementController.class).retriveAllAnnouncement()).withRel("retriveAllAnnouncement"));
 		return 	ResponseEntity.ok(e);
 	}
+	
+	@GetMapping("/retriveAnnouncementByClub/{clubId}")
+	public List<Announcement> retriveAnnouncementByClubId(@PathVariable int clubId) {
+	 return	announcementService.getAnnouncementsByClub(clubId);
+		
+	}
 
 
-    @GetMapping("")
-	private ResponseEntity<CollectionModel<EntityModel<Announcement>>> retriveAllAnnouncement() {
+    @GetMapping("/retriveAllAnnouncement")
+	public ResponseEntity<CollectionModel<EntityModel<Announcement>>> retriveAllAnnouncement() {
 		
     	List<Announcement> result=announcementService.getAllAnnouncemnt();
     	List<EntityModel<Announcement>> e=result.stream().map(a->EntityModel.of(a,
@@ -77,43 +80,21 @@ public class AnnouncementController {
 
 
     @PatchMapping("/{announcementId}/update")
-    private Announcement updateAnnouncement(@Valid @RequestBody RequestAnnouncementUpdateDto dto ,@PathVariable int announcementId) {
+    public Announcement updateAnnouncement(@Valid @RequestBody RequestAnnouncementUpdateDto dto ,@PathVariable int announcementId) {
     	
     	       return announcementService.updateAnnouncement(announcementId, dto);
 			
 	}
 
     @DeleteMapping("/{announcementId}/{creaatedById}")
-	private void deleteAnnouncement(@PathVariable int announcementId,@PathVariable long creaatedById  ) {
-    	
+	public ResponseEntity<Void> deleteAnnouncement(@PathVariable int announcementId,@PathVariable long creaatedById  ) {
+    	announcementService.deleteAnnouncement(announcementId, creaatedById);
+    	return ResponseEntity.noContent().build();
 		
-		return null;
 	}
-
-
-
-	
-
-
 
 	
 
 }
 
 
-
-/*
- * 1. AnnouncementController
- * 
- * POST /api/clubs/{clubId}/announcements → createAnnouncement
- * 
- * GET /api/announcements/{id} → getAnnouncementById
- * 
- * GET /api/clubs/{clubId}/announcements → getAnnouncementsByClub
- * 
- * GET /api/students/{studentId}/announcements → getAnnouncementsByStudent
- * 
- * PUT /api/announcements/{id} → updateAnnouncement
- * 
- * DELETE /api/announcements/{id}?requesterId={studentId} → deleteAnnouncemen
- */

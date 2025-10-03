@@ -22,7 +22,6 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-
 public class AnnouncementService {
 	
 	
@@ -148,7 +147,7 @@ public class AnnouncementService {
 		return saved;
 	} 
 	
-	public void deleteAnnouncement(int announcementId, long requesterId) {
+	public String deleteAnnouncement(int announcementId, long requesterId) {
 		
 		Announcement a=announcementRepository.findById(announcementId).orElseThrow(
 				()->new resourceNotFoundException("Announcement with id :"+announcementId+" not found"));
@@ -157,14 +156,9 @@ public class AnnouncementService {
 		}
 		else {
 			announcementRepository.deleteById(announcementId);
+			return "deleted succesfully";
 		}
-		/*
-		 * if(!checkPortalAdminAccess(requesterId, clubId)) { throw new
-		 * notAuthorizedUserException("Not authorized s:"+requesterId); }
-		 * 
-		 * Announcement a=getAnnouncementById(announcementId);
-		 * announcementRepository.delete(a);
-		 */
+		
 		
 	}
 	

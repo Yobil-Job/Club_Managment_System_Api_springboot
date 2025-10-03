@@ -46,6 +46,7 @@ public class Announcement {
 	private LocalDateTime createdAt;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Student createdBy;
 	
 	public Announcement() {}

@@ -1,15 +1,18 @@
 package com.club.api.club_managment_api.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.club.api.club_managment_api.dtos.events.RequestEventDto;
 import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Event;
 import com.club.api.club_managment_api.models.Student;
 import com.club.api.club_managment_api.models.enums.Role_enum;
+import com.club.api.club_managment_api.repository.AuthorityRepository;
 import com.club.api.club_managment_api.repository.EventRepository;
 
 import jakarta.transaction.Transactional;
@@ -21,12 +24,14 @@ public class EvenetService {
 	private final EventRepository eventRepository;
 	private final StudentService studentService;
 	private final ClubService clubService;
+	private final AuthorityRepository authorityRepository;
 
-	public EvenetService(EventRepository eventRepository, StudentService studentService, ClubService clubService) {
+	public EvenetService(EventRepository eventRepository, StudentService studentService, ClubService clubService,AuthorityRepository authorityRepository) {
 		super();
 		this.eventRepository = eventRepository;
 		this.studentService = studentService;
 		this.clubService = clubService;
+		this.authorityRepository=authorityRepository;
 	}
 
 	public boolean checkPortalAdminAccess(int studentId, int clubId) {
@@ -43,29 +48,35 @@ public class EvenetService {
 
 	}
 
-	public Event createEvent(Event event, int clubId, int createdById) {
-		Event e = new Event();
-		Club c = clubService.getClubByIdEntity(clubId);
-		Student s = studentService.getStudentByIdEntity(createdById);
-		if (!checkPortalAdminAccess(createdById, clubId)&&
-				event.getClub().getId()!=clubId) {
-			throw new notAuthorizedUserException("Not Authorized: " + createdById);
-		} else { 
-			e.setTitle(event.getTitle());
-			e.setDescription(event.getDescription());
-			e.setClub(c);
-			e.setCreatedBy(s);
-			e.setAttendees(event.getAttendees());
-			e.setLatitude(event.getLatitude());
-			e.setLongitude(event.getLongitude());
-			e.setStartAt(event.getStartAt());
-			e.setEndAt(event.getEndAt());
-		}
+	public Event createEvent(RequestEventDto dto, long studentId) {
+	    
+	    
+	    boolean hasAuthority = authorityRepository.existsByStudentIdAndClubId(studentId, dto.getClubId());
+	    if (!hasAuthority) {
+	        throw new notAuthorizedUserException("Only authorities can post events");
+	    }
 
-		return eventRepository.save(e);
+	    
+	    Event event = new Event();
+	    Club club = clubService.getClubByIdEntity(dto.getClubId());
+	    Student creator = studentService.getStudentByIdEntity(studentId);
 
+	    event.setTitle(dto.getTitle());
+	    event.setDescription(dto.getDescription());
+	    event.setClub(club);
+	    event.setCreatedBy(creator);
+
+	   
+	    if (dto.getAttendees() != null && !dto.getAttendees().isEmpty()) {
+	        List<Student> attendeeList = dto.getAttendees().stream()
+	            .map(id -> studentService.getStudentByIdEntity(id))
+	            .collect(Collectors.toList());
+	        event.setAttendees(attendeeList);
+	    }
+
+	    
+	    return eventRepository.save(event);
 	}
-
 	public Event getEventById(int id) {
 		return eventRepository.findById(id).orElseThrow(() -> new resourceNotFoundException("No event found: " + id));
 	}
