@@ -85,6 +85,10 @@ public class EvenetService {
 		Club c = clubService.getClubByIdEntity(clubId);
 		return eventRepository.findByclub(c);
 	}
+	
+	public List<Event> getAllEvents() {
+		return eventRepository.findAll();
+	}
 
 	public Event updateEvent(int eventId, Event updated, int createdById, int clubId) {
 		Event e = getEventById(eventId);
