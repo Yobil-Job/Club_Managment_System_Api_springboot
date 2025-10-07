@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,9 +51,15 @@ public class EventController {
 	public ResponseEntity<EntityModel<Event>> retriveEventById(@PathVariable int eventId) {
 		Event event=evenetService.getEventById(eventId);
 		EntityModel<Event> e=EntityModel.of(event,
-				linkTo(methodOn(EventController.class).updateEvent()).withRel("update"),
-				linkTo(methodOn(EventController.class).deleteEvent()).withRel("delete"));
+				linkTo(methodOn(EventController.class).deleteEvent(event.getId(),event.getCreatedBy().getId())).withRel("delete"));
 		return ResponseEntity.ok(e);
+	}
+	
+	@GetMapping("/club/{clubId}")
+	public List<Event> retriveEventByClubId(@PathVariable int clubId) {
+		return evenetService.getEventsByClub(clubId);
+		
+		
 	}
 	
 	@GetMapping("/allEvents")
@@ -67,15 +74,18 @@ public class EventController {
 	}
 
 	@PatchMapping("/{eventId}/update/{studentId}")
-	public  void updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto) {
+	public  Event updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto) {
 		
 		
-		evenetService.updateEvent(0, null, 0, 0);
-		return null;
+		return evenetService.updateEvent(eventId, dto,studentId);
+		
 	}
-	private Class<?> deleteEvent() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	@DeleteMapping("/{eventId}/delete/{studentId}")
+	public ResponseEntity<Void> deleteEvent(@PathVariable int eventId ,@PathVariable long studentId) {
+		
+		evenetService.deleteEvent(eventId, studentId);
+		return ResponseEntity.noContent().build();
 	}
 
 	
@@ -85,24 +95,7 @@ public class EventController {
 
 }
 
+
 /*
- * 2. EventController
- * 
- * POST /api/clubs/{clubId}/events → createEvent
- * 
- * GET /api/events/{id} → getEventById
- * 
- * GET /api/clubs/{clubId}/events → getEventsByClub
- * 
- * GET /api/students/{studentId}/events → getEventsByStudent
- * 
- * PUT /api/events/{id} → updateEvent
- * 
- * DELETE /api/events/{id}?requesterId={studentId} → deleteEvent
- * 
- * POST /api/events/{eventId}/attendees/{studentId} → addAttendee
- * 
- * DELETE /api/events/{eventId}/attendees/{studentId} → removeAttendee
- * 
  * GET /api/events/{eventId}/attendees → getAttendees
  */

@@ -1,11 +1,13 @@
 package com.club.api.club_managment_api.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.club.api.club_managment_api.dtos.events.RequestEventDto;
+import com.club.api.club_managment_api.dtos.events.RequestEventUpdateDto;
 import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
@@ -65,7 +67,10 @@ public class EvenetService {
 	    event.setDescription(dto.getDescription());
 	    event.setClub(club);
 	    event.setCreatedBy(creator);
-
+	    event.setStartAt(dto.getStartAt());
+	    event.setEndAt(dto.getEndAt());
+	    event.setLatitude(dto.getLatitude());
+	    event.setLongitude(dto.getLongitude());
 	   
 	    if (dto.getAttendees() != null && !dto.getAttendees().isEmpty()) {
 	        List<Student> attendeeList = dto.getAttendees().stream()
@@ -90,31 +95,47 @@ public class EvenetService {
 		return eventRepository.findAll();
 	}
 
-	public Event updateEvent(int eventId, Event updated, int createdById, int clubId) {
-		Event e = getEventById(eventId);
-		if (!checkPortalAdminAccess(createdById, clubId)) {
-			throw new notAuthorizedUserException("Not Authorized: " + createdById);
-		} else {
-			e.setTitle(updated.getTitle());
-			e.setDescription(updated.getDescription()); 
-			e.setAttendees(updated.getAttendees());
-			e.setLatitude(updated.getLatitude()); 
-			e.setLongitude(updated.getLongitude());
-			e.setStartAt(updated.getStartAt());
-			e.setEndAt(updated.getEndAt());
+	public Event updateEvent(int eventId, RequestEventUpdateDto dto, long createdById) {
 
-		}
-		
-		return eventRepository.save(e);
+	    
+	    Event event = eventRepository.findById(eventId)
+	            .orElseThrow(() -> new resourceNotFoundException("Event with id: " + eventId + " not found"));
 
+	    
+	    if (event.getCreatedBy().getId() != createdById) {
+	        throw new notAuthorizedUserException("Only the authority who created the event can edit it");
+	    }
+
+	    
+	    if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
+	        event.setTitle(dto.getTitle());
+	    }
+
+	    
+	    if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
+	        event.setDescription(dto.getDescription());
+	    }
+
+	   
+	    if (dto.getAttendees() != null && !dto.getAttendees().isEmpty()) {
+	        List<Student> updatedAttendees = dto.getAttendees().stream()
+	                .map(id -> studentService.getStudentByIdEntity(id))
+	                .collect(Collectors.toList());
+	        event.setAttendees(updatedAttendees);
+	    }
+
+	   
+	    return eventRepository.save(event);
 	}
 
-	public void deleteEvent(int eventId, int requesterId, int clubId) {
+
+	public void deleteEvent(int eventId, long requesterId) {
 		Event e = getEventById(eventId);
-		if (!checkPortalAdminAccess(requesterId, clubId)) {
-			throw new notAuthorizedUserException("Not Authorized: " + requesterId);
-		} else {
+		if(e.getCreatedBy().getId()==requesterId) {
 			eventRepository.delete(e);
+		}
+		else {
+			throw new notAuthorizedUserException("Only the creator of the event can delete it");
 		}
 		
 	}

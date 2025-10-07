@@ -1,10 +1,12 @@
 package com.club.api.club_managment_api.models;
 
-import java.awt.geom.Point2D.Double;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,6 +33,7 @@ public class Event {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "club_id",nullable = false)
+	@JsonIgnore
 	private Club club;
 	
 	@NotBlank
@@ -55,6 +58,7 @@ public class Event {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "created_by", nullable = false)
+	@JsonIgnore
 	private Student createdBy;
 	
 	@ManyToMany(fetch = FetchType.LAZY)

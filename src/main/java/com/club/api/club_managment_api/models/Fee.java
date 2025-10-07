@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.validator.constraints.Length;
 
 import com.club.api.club_managment_api.models.enums.Payment_Status_enum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,9 +31,11 @@ public class Fee {
 	private int id;
 	
 	@ManyToOne
+	@JsonIgnore
 	private Student student;
 	
 	@ManyToOne
+	@JsonIgnore
 	private Club club;
 	
 	@NotNull

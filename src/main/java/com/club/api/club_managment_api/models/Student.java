@@ -91,8 +91,8 @@ public class Student {
 	@Column(nullable = false)
 	private Role_enum role;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "event_attendees", joinColumns = @JoinColumn(name = "student_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+	@ManyToMany(mappedBy = "attendees", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Event> eventsAttended;
 
 	public Student() {

@@ -91,20 +91,6 @@ public class AnnouncementService {
         
         
         
-        
-		/*
-		 * Student s=studentService.getStudentByIdEntity(dto.getCreatedById()); Club
-		 * c=clubService.getClubByIdEntity(dto.getClubId()); List<Authority>
-		 * savedAuthority=authorityRepository.findByClub(c);
-		 * savedAuthority.stream().map(author->author.getStudent().getId()) if( ) {
-		 * throw new
-		 * notAuthorizedUserException("you dont have authority to creat announcement: "
-		 * +dto.getCreatedById()); } Announcement a=new Announcement();
-		 * a.setTitle(dto.getTitle()); a.setDescription(dto.getDescription());
-		 * a.setClub(c); a.setCreatedBy(s); Announcement
-		 * saved=announcementRepository.save(a); clubService.addAnnouncement(a,
-		 * dto.getClubId()); return saved;
-		 */
 	 
 	}
 	

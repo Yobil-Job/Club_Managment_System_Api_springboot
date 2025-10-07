@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.club.api.club_managment_api.dtos.Fees.RequestFeesDto;
+import com.club.api.club_managment_api.dtos.Fees.RequestStatusUpdateDto;
 import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
@@ -30,27 +32,14 @@ public class FeeService {
 		this.studentService = studentService;
 	}
 
-	public boolean checkPortalAdminAccess(int studentId, int clubId) {
-		boolean haveAccess = false;
-		Student s = studentService.getStudentByIdEntity(studentId);
-		;
-		if (s.getRole().equals(Role_enum.ADMIN) && clubService.getMemberExistanseByStudentId(clubId, studentId)) {
-			haveAccess = true;
-		} else {
-			haveAccess = false;
-		}
-
-		return haveAccess;
-
-	}
-
-	public Fee recordFee(Fee fee, int studentId, int clubId) {
+	
+	public Fee recordFee(RequestFeesDto dto, long studentId, int clubId) {
 		Club c = clubService.getClubByIdEntity(clubId);
 
 		Fee f = new Fee();
-		f.setAmount(fee.getAmount());
+		f.setAmount(dto.getAmount());
 		f.setClub(c);
-		f.setPurpose(fee.getPurpose());
+		f.setPurpose(dto.getPurpose());
 		f.setStudent(studentService.getStudentByIdEntity(studentId));
 		f.setStatus(Payment_Status_enum.PENDING);
 		return feeRepository.save(f);
@@ -61,7 +50,7 @@ public class FeeService {
 				.orElseThrow(() -> new resourceNotFoundException("No payment information found:" + id));
 	}
 
-	public List<Fee> getFeesByStudent(int studentId) {
+	public List<Fee> getFeesByStudent(long studentId) {
 		return feeRepository.findBystudent(studentService.getStudentByIdEntity(studentId));
 	}
 
@@ -70,26 +59,35 @@ public class FeeService {
 
 	}
 
-	public Fee updateFeeStatus(int feeId, Payment_Status_enum newStatus, int studentId, int clubId) {
-		Fee f = getFeeById(feeId);
-		if (!checkPortalAdminAccess(studentId, clubId)) {
-			throw new notAuthorizedUserException("not authorised:" + studentId);
-		} else {
-			if (f.getClub().getId() != clubId) {
-			    throw new IllegalArgumentException("Fee does not belong to this club!");
-			}
-			else
-			f.setStatus(newStatus);
-		}
-		return feeRepository.save(f);
+	public Fee updateFeeStatus(int feeId, RequestStatusUpdateDto dto) {
+		
+		Fee f=getFeeById(feeId);
+		System.out.println(f.getClub().getId());
+		System.out.println(dto.getAdminStudentId());
+		System.out.println(f.getClub().getClubAdminId()==dto.getAdminStudentId());
+		
+	if(f.getClub().getClubAdminId()!=dto.getAdminStudentId()) {
+		throw new notAuthorizedUserException("only club admins can approve payment");
+	}
+	else {
+		f.setStatus(dto.getStatus());
+		Fee saved=feeRepository.save(f);
+		
+		return saved;
+	}
+		
+		
 	}
 
 	public double getTotalCollectedByClub(int clubId) {
-		List<Fee> fees = getFeesByClub(clubId);
-		double total = fees.stream().mapToDouble(Fee::getAmount) // extract amount
-				.sum();
-		return total;
-
+	    List<Fee> fees = getFeesByClub(clubId);
+	    
+	    double total = fees.stream()
+	            .filter(fee -> fee.getStatus() == Payment_Status_enum.PAID) 
+	            .mapToDouble(Fee::getAmount)
+	            .sum();
+	    
+	    return total;
 	}
 
 }

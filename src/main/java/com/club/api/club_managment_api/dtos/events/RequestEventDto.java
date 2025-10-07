@@ -1,6 +1,6 @@
 package com.club.api.club_managment_api.dtos.events;
 
-import java.awt.geom.Point2D.Double;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class RequestEventDto {
 	}
 
 
-	public void setClubId(int club) {
+	public void setClubId(int clubId) {
 		this.clubId = clubId;
 	}
 
