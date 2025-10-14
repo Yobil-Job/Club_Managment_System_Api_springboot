@@ -95,7 +95,3 @@ public class EventController {
 
 }
 
-
-/*
- * GET /api/events/{eventId}/attendees → getAttendees
- */

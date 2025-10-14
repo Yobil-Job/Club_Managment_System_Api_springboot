@@ -86,17 +86,3 @@ public class FeeController {
 
 }
  
-
-
-/*
- * 4. FeeController
- * 
- * 
-
- * 
- * PUT /api/fees/ → 
- * 
- * GET /api/students/{studentId}/fees/outstanding → 
- * 
- * GET /api/clubs/{clubId}/fees/total-collected → 
- */

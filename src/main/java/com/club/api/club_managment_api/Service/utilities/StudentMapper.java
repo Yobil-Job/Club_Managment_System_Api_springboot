@@ -1,5 +1,6 @@
 package com.club.api.club_managment_api.Service.utilities;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.club.api.club_managment_api.dtos.student.StudentRequestDto;
@@ -10,13 +11,22 @@ import com.club.api.club_managment_api.models.Student;
 
 @Component
 public class StudentMapper {
+	
+	private PasswordEncoder passwordEncoder;
+	
+	
+
+	public StudentMapper(PasswordEncoder passwordEncoder) {
+
+		this.passwordEncoder = passwordEncoder;
+	}
 
 	public Student toStudentEntity(StudentRequestDto dto) {
 		Student s = new Student();
 		s.setFirstname(dto.getFirstname());
 		s.setLastname(dto.getLastname());
 		s.setEmail(dto.getEmail());
-		s.setPassword(dto.getPassword());
+		s.setPassword(passwordEncoder.encode(dto.getPassword()));
 		s.setYearOfStay(dto.getYearOfStay());
 		s.setGender(dto.getGender());
 		return s;

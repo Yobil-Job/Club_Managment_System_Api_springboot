@@ -179,21 +179,3 @@ public class ClubController {
 	 
 }
 
-
-/*
- * 3. ClubController
-
- * POST /api/clubs/{clubId}/members/{studentId} → 
- * 
- * DELETE /api/clubs/{clubId}/members/{studentId} → removeMember
- * 
- * GET /api/clubs/{clubId}/members → 
- * 
- * POST /api/clubs/{clubId}/authorities/{studentId} → assignAuthority
- * 
- * GET /api/clubs/{clubId}/authorities → getAuthorities
- * 
- * GET /api/clubs/{clubId}/events → getEvents
- * 
- * GET /api/clubs/{clubId}/announcements → getAnnouncements
- */

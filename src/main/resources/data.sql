@@ -25,5 +25,11 @@ ALTER TABLE student_club ADD COLUMN status VARCHAR(20);
 
 
 
+INSERT INTO Students (first_name, last_name, email, password, year_of_stay, gender, role)
+VALUES 
+('System', 'Admin', 'superadmin@example.com', 
+ '$2a$10$zA24CX1qgumck8PCojSj6u3w9eFsFKLKtHKe94oXetcmxE7iCoVc6', 
+ 'First_Year', 'MALE', 'SUPER_ADMIN');
+
 
 

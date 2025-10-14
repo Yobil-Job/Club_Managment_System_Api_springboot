@@ -2,6 +2,7 @@ package com.club.api.club_managment_api.Service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.club.api.club_managment_api.Service.utilities.ClubMapper;
@@ -46,6 +47,7 @@ public class StudentService {
 		this.clubMapper = clubMapper;
 		this.eventRepository = eventRepository;
 		this.studentClubRepository=studentClubRepository;
+		
 	}
 
 
