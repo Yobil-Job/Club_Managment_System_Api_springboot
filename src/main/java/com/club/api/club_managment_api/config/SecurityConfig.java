@@ -2,7 +2,6 @@ package com.club.api.club_managment_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,13 +19,13 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    http
 	        .csrf(csrf -> csrf.disable())
-	        .headers(headers -> headers.frameOptions().disable()) // for H2 console
+	        .headers(headers -> headers.frameOptions(frame->frame.disable())) 
 	        .authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/student/register**", "/h2-console/**").permitAll() // note **
 	            .anyRequest().authenticated()
 	        )
-	        .formLogin(form -> form.disable()) // disable form login
-	        .httpBasic(basic -> basic.disable()); // disable basic auth for public access
+	        .formLogin(form -> form.disable())
+	        .httpBasic(basic->basic.disable()); 
 
 	    return http.build();
 	}

@@ -31,6 +31,7 @@ public class StudentService {
 	private final ClubMapper clubMapper;
 	private final EventRepository eventRepository;
 	private final StudentClubRepository studentClubRepository;
+	private final PasswordEncoder passwordEncoder;
 	
 	
 	
@@ -39,7 +40,8 @@ public class StudentService {
 	
 
 	public StudentService(StudentRepository studentRepository, StudentMapper studentMapper, ClubService clubService,
-			ClubMapper clubMapper, EventRepository eventRepository,StudentClubRepository studentClubRepository) {
+			ClubMapper clubMapper, EventRepository eventRepository,StudentClubRepository studentClubRepository
+			,PasswordEncoder passwordEncoder) {
 		super();
 		this.studentRepository = studentRepository;
 		this.studentMapper = studentMapper;
@@ -47,6 +49,7 @@ public class StudentService {
 		this.clubMapper = clubMapper;
 		this.eventRepository = eventRepository;
 		this.studentClubRepository=studentClubRepository;
+		this.passwordEncoder=passwordEncoder; 
 		
 	}
 
@@ -72,7 +75,7 @@ public class StudentService {
 		  if(updated.getFirstname()!=null)s.setFirstname(updated.getFirstname());
 		  if(updated.getLastname()!=null)s.setLastname(updated.getLastname());
 		  //if(updated.getEmail()!=null)s.setEmail(updated.getEmail()); 
-		  if(updated.getPassword()!=null)s.setPassword(updated.getPassword());
+		  if(updated.getPassword()!=null)s.setPassword(passwordEncoder.encode(updated.getPassword()));
 		  if(updated.getYearOfStay()!=null)s.setYearOfStay(updated.getYearOfStay()); 
 		  if(updated.getDepartment()!=null)s.setDepartment(updated.getDepartment()); 
 		  if(updated.getGender()!=null)s.setGender(updated.getGender());
@@ -102,7 +105,8 @@ public class StudentService {
 
 	public Student getStudentByEmail(String email) {
 
-		Student s = studentRepository.findByEmail(email);
+		Student s = studentRepository.findByEmail(email)
+				.orElseThrow(()->new resourceNotFoundException("user not found "+email));
 		if (s == null) {
 			throw new resourceNotFoundException("Student with id :" + email + " not found");
 		}
