@@ -2,13 +2,16 @@ package com.club.api.club_managment_api.config;
 
 import java.io.IOException;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import sun.net.www.protocol.http.AuthenticationHeader;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
@@ -30,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		 
-		final String authHeader=request.getHeader("Authentication");
+		final String authHeader = request.getHeader("Authorization");
 		final String jwtToken;
 		final String username;
 		
@@ -38,6 +41,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		
+		jwtToken=authHeader.substring(7);  
+		username=jwtUtil.extractUsername(jwtToken);
+		
+		
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
+
+            if (jwtUtil.validateToken(jwtToken, userDetails.getUsername())) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+               
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+		
+		 filterChain.doFilter(request, response);
 		
 	}
 

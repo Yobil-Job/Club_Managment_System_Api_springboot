@@ -3,14 +3,16 @@ package com.club.api.club_managment_api.config;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import com.club.api.club_managment_api.models.Student;
 import com.club.api.club_managment_api.repository.StudentRepository;
 
+@Service
 public class CustomUserDetailsService implements UserDetailsService{
 
 	private StudentRepository studentRepository;
-	
+	 
 	  
 	
 	public CustomUserDetailsService(StudentRepository studentRepository) {
