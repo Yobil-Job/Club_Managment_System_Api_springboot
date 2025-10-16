@@ -1,15 +1,12 @@
 package com.club.api.club_managment_api.config;
 
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,7 +45,12 @@ public class SecurityConfig {
 	        .csrf(csrf -> csrf.disable())
 	        .headers(headers -> headers.frameOptions(frame->frame.disable())) 
 	        .authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/student/register**", "/h2-console/**").permitAll() // note **
+	            .requestMatchers("/student/register**",
+	            		"/h2-console/**",
+	            		 "/auth/**",             
+	                     "/v3/api-docs/**",         
+	                     "/swagger-ui/**",
+	                     "/swagger-ui.html").permitAll() // note **
 	            .anyRequest().authenticated()
 	        )
 	        .formLogin(form -> form.disable())
@@ -74,9 +76,10 @@ public class SecurityConfig {
 	    }
 	  
 	  @Bean
-	    public AuthenticationManager authenticationManager() {
-	        return new ProviderManager(List.of(authenticationProvider()));
-	    }
+	  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+	      return config.getAuthenticationManager();
+	  }
+
 	  
 } 
 
