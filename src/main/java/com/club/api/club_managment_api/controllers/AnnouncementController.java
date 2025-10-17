@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,6 +41,7 @@ public class AnnouncementController {
 
 
 	@PostMapping("/create")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
 	public ResponseEntity<EntityModel<Announcement>> createAnnouncement(@Valid @RequestBody RequestAnnouncementDto dto) {
 		
 		  Announcement a=announcementService.createAnnouncement(dto);

@@ -77,11 +77,19 @@ public class AuthController {
 	        );
 	    }
 
+
 	
 	@PostMapping("/logout")
-	public ResponseEntity<Object> logout() {
-		SecurityContextHolder.clearContext();
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequest request) {
+	    String refreshTokenStr = request.getRefreshToken();
+
+	    refreshTokenService.findByToken(refreshTokenStr)
+	        .ifPresent(token -> refreshTokenService.deleteByStudentId(token.getStudent().getId()));
+
+	    SecurityContextHolder.clearContext();
+
+	    return ResponseEntity.ok().build();
 	}
+
 
 }

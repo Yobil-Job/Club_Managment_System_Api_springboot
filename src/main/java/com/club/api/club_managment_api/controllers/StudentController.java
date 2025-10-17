@@ -71,7 +71,7 @@ public class StudentController {
 	}
 
 	@GetMapping("/allstudents")
-	@PreAuthorize("hasAnyRole('SUPER_ADMIN')")
+	@PreAuthorize("hasRole('SUPER_ADMIN')")
 	public ResponseEntity<CollectionModel<EntityModel<StudentResponseDto>>> retriveAllStudents() {
 
 		List<EntityModel<StudentResponseDto>> e = studentService.getAllStudents().stream()
@@ -113,7 +113,7 @@ public class StudentController {
 	}
 
 	@GetMapping("/{id}/events")
-	@PreAuthorize("#id == authentication.principal.id or hasRole('SUPER_ADMIN','ADMIN')")
+	@PreAuthorize("#id == authentication.principal.id or hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public List<Event> getEventsAttended(@PathVariable long id) {
 
 		return studentService.getEventsAttended(id);
