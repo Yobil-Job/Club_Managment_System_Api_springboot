@@ -20,6 +20,7 @@ import com.club.api.club_managment_api.models.Authority;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Event;
 import com.club.api.club_managment_api.models.Student;
+import com.club.api.club_managment_api.models.enums.Role_enum;
 import com.club.api.club_managment_api.repository.ClubRepository;
 import com.club.api.club_managment_api.repository.StudentClubRepository;
 import com.club.api.club_managment_api.repository.StudentRepository;
@@ -217,7 +218,9 @@ public class ClubService {
 	public void addClubAdmin(long studentId,int clubId) {
 		
 		Club c=getClubByIdEntity(clubId);
+		Student s=studentRepository.findById(studentId).orElseThrow(()->new resourceNotFoundException("no user found"));
 		c.setClubAdminId(studentId);
+		s.setRole(Role_enum.ADMIN);
 		clubRepository.save(c);
 		
 		

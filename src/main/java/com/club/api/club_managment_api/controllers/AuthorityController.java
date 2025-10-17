@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,7 +27,6 @@ import com.club.api.club_managment_api.models.Authority;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.repository.ClubRepository;
 import com.club.api.club_managment_api.repository.StudentClubRepository;
-import com.club.api.club_managment_api.repository.StudentRepository;
 
 import jakarta.validation.Valid;
 
@@ -50,6 +50,7 @@ public class AuthorityController {
 	
 
 	@PostMapping("/{clubAdminId}/create")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<EntityModel<Authority>> createAuthority(@Valid @RequestBody RequestAuthorityDto dto,@PathVariable int clubAdminId) {
 		
 		int clubId=dto.getClubId();
@@ -83,6 +84,7 @@ public class AuthorityController {
 		
 	}
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<EntityModel<Authority>> retriveAuthorityById(@PathVariable int id) {
 	    Authority authority = authorityService.getAuthorityById(id) ;
 	            
@@ -97,6 +99,7 @@ public class AuthorityController {
 	}
 	
 	@GetMapping("/clubs/{clubId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<CollectionModel<EntityModel<Authority>>>  getAuthoritiesByClub(@PathVariable int clubId) {
 		List<Authority> authorities=authorityService.getAuthoritiesByClub(clubId);
 		List<EntityModel<Authority>> e=authorities.stream().map(a->EntityModel.of(a,
@@ -110,6 +113,7 @@ public class AuthorityController {
 	}
 	
 	@GetMapping("/students/{studentId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<CollectionModel<EntityModel<Authority>>> getAuthoritiesByStudent(@PathVariable long studentId) {
 		List<Authority> authorities= authorityService.getAuthoritiesByStudent(studentId);
 		List<EntityModel<Authority>> e=authorities.stream().map(a->EntityModel.of(a,
@@ -123,6 +127,7 @@ public class AuthorityController {
 	}
 	
 	@PatchMapping("/{authorityId}/update/{clubAdminId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public Authority updateAuthority(@PathVariable int authorityId,@PathVariable int clubAdminId,@RequestBody RequestAuthorityUpdateDto dto) {
 		
 		return authorityService.updateAuthority(authorityId, dto.getName(), dto.getStudentId(), dto.getClubId(), dto.getStartDate(), dto.getEndDate());
@@ -131,6 +136,7 @@ public class AuthorityController {
 	}
 	
 	@DeleteMapping("/{authorityId}/delete/{clubId}/{clubAdminId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public String removeAuthority(@PathVariable int authorityId,@PathVariable int clubId,@PathVariable int clubAdminId) {
 		
 		authorityService.removeAuthority(authorityId, clubId, clubAdminId);

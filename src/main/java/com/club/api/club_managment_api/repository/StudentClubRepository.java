@@ -1,6 +1,5 @@
 package com.club.api.club_managment_api.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;

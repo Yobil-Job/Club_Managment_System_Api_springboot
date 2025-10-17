@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -57,6 +58,7 @@ public class ClubController {
 
 	
 	@PostMapping("create")
+	@PreAuthorize("hasRole('SUPER_ADMIN')")
 	public ResponseEntity<EntityModel<ResponseClubDto>>  createClub(@Valid @RequestBody RequestClubDto dto) {
 		ResponseClubDto club= clubService.createClub(dto);
 		EntityModel<ResponseClubDto> e=EntityModel.of(club,
@@ -68,6 +70,7 @@ public class ClubController {
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("#id == authentication.principal or hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<EntityModel<ResponseClubDto>> retriveClubById(@PathVariable int id) {
 		ResponseClubDto club = clubService.getClubById(id);
 		EntityModel<ResponseClubDto> response=EntityModel.of(club,
@@ -75,7 +78,9 @@ public class ClubController {
 		return ResponseEntity.ok(response);
 	}
 	
+	
 	@GetMapping("all-clubs")
+	@PreAuthorize("#id == authentication.principal or hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<CollectionModel<EntityModel<ResponseClubDto>>> retriveAllClubs() {
 		
 		List<EntityModel<ResponseClubDto>> e=clubService.getAllClubs().stream()
@@ -90,12 +95,14 @@ public class ClubController {
 
 	
 	@PatchMapping("/{id}/update")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	  public void updateClubInfo(@PathVariable int id, @Valid @RequestBody RequestClubDtoFull dto) {
 		clubService.updateClub(id, dto);
 		
 		  }
 	
 	@DeleteMapping("/{id}/delete")
+	@PreAuthorize("hasRole('SUPER_ADMIN')")
 	public void deleteClub(@PathVariable int id) {
 		
 		clubService.deleteClub(id);
@@ -103,6 +110,7 @@ public class ClubController {
 	
 	
 	 @GetMapping("/{clubId}/requests/pending")
+	 @PreAuthorize("hasRole('ADMIN')")
 	    public ResponseEntity<CollectionModel<EntityModel<PendingRequestGetterDto>>> getPendingRequests(@PathVariable Long clubId) {
 		   
 		   //used for  hateos collection link 
@@ -145,24 +153,28 @@ public class ClubController {
 	    }
 	 
 	 @PatchMapping("/{clubId}/requests/{studentId}/approve")
+	 @PreAuthorize("hasAnyRole('ADMIN')")
 	    public ResponseEntity<String> approveRequest(@PathVariable Long clubId, @PathVariable Long studentId) {
 	        studentClubRepository.updateRequestStatus(clubId, studentId, "APPROVED");
 	        return ResponseEntity.ok("Request approved successfully");
 	    }
 	 
 	 @PatchMapping("/{clubId}/requests/{studentId}/reject")
+	 @PreAuthorize("hasRole('ADMIN')")
 	    public ResponseEntity<String> rejectRequest(@PathVariable Long clubId, @PathVariable Long studentId) {
 	        studentClubRepository.updateRequestStatus(clubId, studentId, "REJECTED");
 	        return ResponseEntity.ok("Request rejected successfully");
 	    }
 	 
 	 @GetMapping("/{clubId}/get-members")
+	 @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	 public List<StudentResponseDto> getMembers(@PathVariable int clubId) {
 		 return clubService.getMembers(clubId);
 		 
 	 }
 	
 	 @PatchMapping("/{clubId}/assign-clubAdmin/{memberId}")
+	 @PreAuthorize("hasRole('SUPER_ADMIN')")
 	 public ResponseEntity<String> assignClubAdmin(@PathVariable long memberId,@PathVariable int clubId) {
 		 if(!studentClubRepository.isApprovedMemberOfClub(memberId, clubId)) {
 			 throw new resourceNotFoundException("To assigne as club admin the student must be approved member:"+memberId);
