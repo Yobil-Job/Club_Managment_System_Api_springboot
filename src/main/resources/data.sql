@@ -31,5 +31,23 @@ VALUES
  '$2a$10$zA24CX1qgumck8PCojSj6u3w9eFsFKLKtHKe94oXetcmxE7iCoVc6', 
  'First_Year', 'MALE', 'SUPER_ADMIN');
 
+ 
 
+INSERT INTO students (
+    email,
+    first_name,
+    last_name,
+    gender,
+    password,
+    role,
+    year_of_stay
+) VALUES (
+    'superadmin2@example.com',
+    'System',
+    'Admin',
+    'MALE',
+    '$2a$10$XKMqiQmnljEtDh12pQbtsuDu0cOseUd3qcTi9LQ4z5TZ1nFwJ79a2',
+    'SUPER_ADMIN',
+    'First_Year'
+);
 

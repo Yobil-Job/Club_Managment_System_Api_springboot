@@ -41,19 +41,27 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
 
-		Authentication authentication= authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
-	     Student student=studentRepository.findByEmail(request.getEmail()).orElseThrow(
-	    		 ()->new resourceNotFoundException("invalid Credientional "+ request.getEmail()));
-	     
-	     String accessToken=jwtUtil.generateAccessTocken(student.getId(),student.getEmail(),student.getRole().name());
-	     String refreshToken=jwtUtil.generateRefreshToken(student.getId(),student.getEmail(),student.getRole().name());
-	     
-	     return ResponseEntity.ok(new LoginResponse(accessToken,refreshToken,student.getRole().name()));
+	    
+	    Authentication authentication = authenticationManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+	    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+	    Student student = studentRepository.findByEmail(request.getEmail())
+	            .orElseThrow(() -> new resourceNotFoundException("Invalid credentials for " + request.getEmail()));
+
+	    String accessToken = jwtUtil.generateAccessTocken(
+	            student.getId(),
+	            student.getEmail(),
+	            student.getRole().name()
+	    );
+
+	    RefreshToken refreshToken = refreshTokenService.createRefreshToken(student.getId());
+
+	    return ResponseEntity.ok(
+	            new LoginResponse(accessToken, refreshToken.getToken(), student.getRole().name())
+	    );
 	}
-	
+
 	 @PostMapping("/refresh")
 	    public ResponseEntity<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
 	        String refreshTokenStr = request.getRefreshToken();
@@ -89,7 +97,7 @@ public class AuthController {
 	    SecurityContextHolder.clearContext();
 
 	    return ResponseEntity.ok().build();
-	}
+	} 
 
 
 }

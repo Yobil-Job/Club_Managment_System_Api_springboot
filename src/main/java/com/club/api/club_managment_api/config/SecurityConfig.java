@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,30 +38,44 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
-        // Create filter here instead of injecting it
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
+        JwtAuthenticationFilter jwtAuthenticationFilter =
+                new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
 
         http
+            // Disable CSRF (for API)
             .csrf(csrf -> csrf.disable())
+            // Enable CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Handle exceptions
             .exceptionHandling(ex -> ex
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     .accessDeniedHandler(customAccessDeniedHandler)
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            // Authorize requests
             .authorizeHttpRequests(auth -> auth
+                    // 👇 All public endpoints here (exact match)
                     .requestMatchers(
-                            "/student/register**",
-                            "/h2-console/**",
+                            "/student/register",
                             "/auth/**",
+                            "/h2-console/**",
                             "/v3/api-docs/**",
                             "/swagger-ui/**",
                             "/swagger-ui.html"
                     ).permitAll()
+                    // 👇 Everything else needs authentication
                     .anyRequest().authenticated()
             )
+            // ✅ Stateless session (no JSESSIONID)
+            .sessionManagement(session -> session.sessionCreationPolicy(
+                    org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+            // Disable form login and basic auth
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
+            // Add our JWT filter before username/password filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Allow H2 console (optional)
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }
@@ -80,8 +94,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http,
+                                                       PasswordEncoder passwordEncoder,
+                                                       CustomUserDetailsService userDetailsService) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                   .userDetailsService(userDetailsService) // use your CustomUserDetailsService
+                   .passwordEncoder(passwordEncoder)       // use your BCryptPasswordEncoder
+                   .and()
+                   .build();
     }
 
     @Bean

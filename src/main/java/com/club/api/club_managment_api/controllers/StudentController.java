@@ -54,7 +54,7 @@ public class StudentController {
 				linkTo(methodOn(StudentController.class).retriveAllStudents()).withRel("all-students"));
 		URI location = linkTo(methodOn(StudentController.class).retriveStudentById(savedStudent.getId())).toUri();
 		return ResponseEntity.created(location).body(responses);
-	}
+	} 
 
 	@GetMapping("/{id}")
 	@PreAuthorize("#id == authentication.principal.id or hasRole('SUPER_ADMIN','ADMIN')")
@@ -73,7 +73,7 @@ public class StudentController {
 	@GetMapping("/allstudents")
 	@PreAuthorize("hasRole('SUPER_ADMIN')")
 	public ResponseEntity<CollectionModel<EntityModel<StudentResponseDto>>> retriveAllStudents() {
-
+ 
 		List<EntityModel<StudentResponseDto>> e = studentService.getAllStudents().stream()
 				.map(student -> EntityModel.of(student,
 						linkTo(methodOn(StudentController.class).retriveStudentById(student.getId())).withSelfRel(),

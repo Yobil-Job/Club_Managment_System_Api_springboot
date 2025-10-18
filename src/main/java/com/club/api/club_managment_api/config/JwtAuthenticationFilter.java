@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -23,22 +21,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
-        super();
         this.jwtUtil = jwtUtil;
         this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, 
+                                    HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // ✅ Skip token validation for public endpoints
+        if (path.equals("/student/register") ||
+            path.startsWith("/auth/") ||
+            path.startsWith("/h2-console/") ||
+            path.startsWith("/swagger-ui/") ||
+            path.startsWith("/v3/api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String username;
 
         try {
+            // ✅ Ensure Bearer token is present
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
@@ -68,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Token expired\"}");
-        } catch (JwtException e) { 
+        } catch (JwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Invalid token\"}");

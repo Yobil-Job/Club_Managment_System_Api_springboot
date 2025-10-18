@@ -1,6 +1,7 @@
 package com.club.api.club_managment_api.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,9 +56,11 @@ public class StudentService {
 
 
 	public StudentResponseDto registerStudent(StudentRequestDto dto) {
-		if (studentRepository.findByEmail(dto.getEmail()) != null) {
-			throw new DuplicateResourceException("user with this email already found " + dto.getEmail());
-		}
+		
+		Optional<Student> existing = studentRepository.findByEmail(dto.getEmail());
+		if (existing.isPresent()) {
+	        throw new DuplicateResourceException("user with this email already found " + dto.getEmail());
+	    }
 		Student s = studentMapper.toStudentEntity(dto);
 		s.setRole(Role_enum.STUDENT);
 		Student saved=studentRepository.save(s);
