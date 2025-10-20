@@ -57,7 +57,7 @@ public class StudentController {
 	} 
 
 	@GetMapping("/{id}")
-	@PreAuthorize("#id == authentication.principal.id or hasRole('SUPER_ADMIN','ADMIN')")
+	@PreAuthorize("#id == authentication.principal.id or hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public ResponseEntity<EntityModel<StudentResponseDtoFull>> retriveStudentById(@PathVariable long id) {
 
 		StudentRequestDtoFull dto = null;

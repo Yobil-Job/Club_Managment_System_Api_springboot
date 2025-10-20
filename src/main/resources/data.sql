@@ -45,7 +45,7 @@ INSERT INTO students (
     'superadmin2@example.com',
     'System',
     'Admin',
-    'MALE',
+    'MALE', 
     '$2a$10$XKMqiQmnljEtDh12pQbtsuDu0cOseUd3qcTi9LQ4z5TZ1nFwJ79a2',
     'SUPER_ADMIN',
     'First_Year'

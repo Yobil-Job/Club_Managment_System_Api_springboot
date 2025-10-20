@@ -64,7 +64,6 @@ public class StudentService {
 		Student s = studentMapper.toStudentEntity(dto);
 		s.setRole(Role_enum.STUDENT);
 		Student saved=studentRepository.save(s);
-		System.out.println(saved);
 
 		return studentMapper.toStudentResponseDto(saved);
 	}

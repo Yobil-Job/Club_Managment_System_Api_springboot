@@ -42,39 +42,30 @@ public class SecurityConfig {
                 new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
 
         http
-            // Disable CSRF (for API)
-            .csrf(csrf -> csrf.disable())
-            // Enable CORS
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // Handle exceptions
+           
+            .csrf(csrf -> csrf.disable())            
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))          
             .exceptionHandling(ex -> ex
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     .accessDeniedHandler(customAccessDeniedHandler)
             )
-            // Authorize requests
             .authorizeHttpRequests(auth -> auth
-                    // 👇 All public endpoints here (exact match)
                     .requestMatchers(
-                            "/student/register",
+                            "/student/register**",
                             "/auth/**",
                             "/h2-console/**",
                             "/v3/api-docs/**",
                             "/swagger-ui/**",
                             "/swagger-ui.html"
                     ).permitAll()
-                    // 👇 Everything else needs authentication
                     .anyRequest().authenticated()
             )
-            // ✅ Stateless session (no JSESSIONID)
             .sessionManagement(session -> session.sessionCreationPolicy(
                     org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-            // Disable form login and basic auth
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
-            // Add our JWT filter before username/password filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Allow H2 console (optional)
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
@@ -98,8 +89,8 @@ public class SecurityConfig {
                                                        PasswordEncoder passwordEncoder,
                                                        CustomUserDetailsService userDetailsService) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                   .userDetailsService(userDetailsService) // use your CustomUserDetailsService
-                   .passwordEncoder(passwordEncoder)       // use your BCryptPasswordEncoder
+                   .userDetailsService(userDetailsService)
+                   .passwordEncoder(passwordEncoder)     
                    .and()
                    .build();
     }
