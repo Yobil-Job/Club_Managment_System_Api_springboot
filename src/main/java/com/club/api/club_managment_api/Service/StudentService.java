@@ -126,9 +126,17 @@ public class StudentService {
 	}
 	
 	public List<ResponseClubDto> getClubs(long studentId) {
-		Student s=getStudentByIdEntity(studentId);
-	   return s.getClubs().stream().map(c->clubMapper.toResponseClubDto(c)).toList();
+	    Student student = getStudentByIdEntity(studentId);
+
+	   
+	    List<ResponseClubDto> approvedClubs = student.getClubs().stream()
+	        .filter(club -> studentClubRepository.isApprovedMemberOfClub(studentId, club.getId()))
+	        .map(club -> clubMapper.toResponseClubDto(club))
+	        .toList();
+
+	    return approvedClubs;
 	}
+
 	
 	public StudentResponseDtoFull registerForEvent(long studentId,int eventId) {
 		Student s=getStudentByIdEntity(studentId);

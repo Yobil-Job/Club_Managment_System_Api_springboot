@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.club.api.club_managment_api.Service.ClubService;
 import com.club.api.club_managment_api.Service.StudentService;
 import com.club.api.club_managment_api.dtos.clubs.ResponseClubDto;
 import com.club.api.club_managment_api.dtos.student.StudentRequestDto;
@@ -37,11 +38,14 @@ public class StudentController {
 
 	private final StudentService studentService;
 	private final StudentClubRepository studentClubRepository;
+	private final ClubService clubService;
 
-	public StudentController(StudentService studentService, StudentClubRepository studentClubRepository) {
+	public StudentController(StudentService studentService, StudentClubRepository studentClubRepository,
+			ClubService clubService) {
 		super();
 		this.studentService = studentService;
 		this.studentClubRepository = studentClubRepository;
+		this.clubService=clubService;
 	}
 
 	@PostMapping("/register")
@@ -124,9 +128,10 @@ public class StudentController {
 	@PreAuthorize("#studentId == authentication.principal.id")
 	public ResponseEntity<String> requestToJoin(@PathVariable Long clubId, @PathVariable Long studentId) {
 		int clubInt = (int) (long) clubId;
-
+		clubService.getClubById(clubInt);
+      
 		if (studentService.isMemberOfClub(studentId, clubInt)) {
-			throw new ResourceAlreadyFoundException("You have already requested to join the club" + clubId);
+			throw new ResourceAlreadyFoundException("You either have  already requested to join the club or Get Mmbership" + clubId);
 		} else {
 			studentClubRepository.insertRequest(clubId, studentId, "PENDING");
 			return ResponseEntity.ok("Request sent successfully!");
