@@ -88,7 +88,6 @@ public class StudentService {
 		
 	}
 
-	//returns responseDto form of student entity
 	public StudentResponseDtoFull getStudentById(long id) {
 
 		//System.out.println(studentRepository.findById(id));
@@ -97,7 +96,7 @@ public class StudentService {
 
 	}
 	
-	//returns normal Student entity from the db
+
 	public Student getStudentByIdEntity(long id) {
 
 		return  studentRepository.findById(id)

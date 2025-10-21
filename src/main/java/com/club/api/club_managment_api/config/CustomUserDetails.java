@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
 		this.student = student;
 	}
 	
-	public long getId() {
+	public Long getId() {
 		return student.getId();
 	}
 
