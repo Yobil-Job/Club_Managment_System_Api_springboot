@@ -110,7 +110,7 @@ public class ClubController {
 	
 	
 	 @GetMapping("/{clubId}/requests/pending")
-	 @PreAuthorize("hasRole('ADMIN')")
+	 @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	    public ResponseEntity<CollectionModel<EntityModel<PendingRequestGetterDto>>> getPendingRequests(@PathVariable Long clubId) {
 		   
 		   //used for  hateos collection link 

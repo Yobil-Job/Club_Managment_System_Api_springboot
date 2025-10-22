@@ -77,10 +77,7 @@ public class AuthorityController {
 			}
 			
 			
-		}
-		
-		
-		
+		}	
 		
 	}
 	@GetMapping("/{id}")
