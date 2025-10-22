@@ -69,7 +69,7 @@ public class StudentMapper {
 		d.setEmail(s.getEmail());
 		d.setYearOfStay(s.getYearOfStay());
 		d.setAuthorities(s.getAuthorities());
-		d.setClubs(s.getClubs());
+		if(s.getClubs()!=null) {d.setClubs(s.getClubs());}
 		d.setCreatedAt(s.getCreatedAt());
 		d.setDepartment(s.getDepartment());
 		d.setGender(s.getGender());

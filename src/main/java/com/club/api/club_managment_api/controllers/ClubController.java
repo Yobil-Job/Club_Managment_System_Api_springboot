@@ -153,7 +153,7 @@ public class ClubController {
 	    }
 	 
 	 @PatchMapping("/{clubId}/requests/{studentId}/approve")
-	 @PreAuthorize("hasAnyRole('ADMIN')")
+	 @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
 	    public ResponseEntity<String> approveRequest(@PathVariable Long clubId, @PathVariable Long studentId) {
 	        studentClubRepository.updateRequestStatus(clubId, studentId, "APPROVED");
 	        return ResponseEntity.ok("Request approved successfully");

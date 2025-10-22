@@ -67,7 +67,7 @@ public class StudentController {
 		StudentRequestDtoFull dto = null;
 		StudentResponseDtoFull student = studentService.getStudentById(id);
 		EntityModel<StudentResponseDtoFull> response = EntityModel.of(student,
-				linkTo(methodOn(StudentController.class).getClubs(student.getId())).withRel("clubs_joined"),
+				
 				linkTo(methodOn(StudentController.class).updateStudentInfo(student.getId(), dto))
 						.withRel("update_info"));
 		return ResponseEntity.ok(response);
