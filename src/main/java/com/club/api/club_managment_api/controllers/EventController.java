@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +37,7 @@ public class EventController {
 	}
 	
 	@PostMapping("/create/{studentId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
 	public ResponseEntity<EntityModel<Event>> createEvent(@Valid @RequestBody RequestEventDto dto,@PathVariable int studentId) {
 		
 		Event event=evenetService.createEvent(dto, studentId);
@@ -48,6 +50,7 @@ public class EventController {
 
 	
 	@GetMapping("/{eventId}")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<EntityModel<Event>> retriveEventById(@PathVariable int eventId) {
 		Event event=evenetService.getEventById(eventId);
 		EntityModel<Event> e=EntityModel.of(event,
@@ -56,6 +59,7 @@ public class EventController {
 	}
 	
 	@GetMapping("/club/{clubId}")
+	@PreAuthorize("isAuthenticated()")
 	public List<Event> retriveEventByClubId(@PathVariable int clubId) {
 		return evenetService.getEventsByClub(clubId);
 		
@@ -63,6 +67,7 @@ public class EventController {
 	}
 	
 	@GetMapping("/allEvents")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<CollectionModel<EntityModel<Event>>> retriveAllEvents() {
 		List<Event> events= evenetService.getAllEvents();
 		List<EntityModel<Event>> e=events.stream().map(event->
@@ -74,6 +79,7 @@ public class EventController {
 	}
 
 	@PatchMapping("/{eventId}/update/{studentId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
 	public  Event updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto) {
 		
 		
@@ -82,6 +88,7 @@ public class EventController {
 	}
 	
 	@DeleteMapping("/{eventId}/delete/{studentId}")
+	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
 	public ResponseEntity<Void> deleteEvent(@PathVariable int eventId ,@PathVariable long studentId) {
 		
 		evenetService.deleteEvent(eventId, studentId);
