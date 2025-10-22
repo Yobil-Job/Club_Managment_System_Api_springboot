@@ -55,6 +55,7 @@ public class AnnouncementController {
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<EntityModel<Announcement>> retriveAnnouncementById(@PathVariable int id) {
 		Announcement a=announcementService.getAnnouncementById(id);
 		EntityModel<Announcement> e=EntityModel.of(a,
@@ -63,6 +64,7 @@ public class AnnouncementController {
 	}
 	
 	@GetMapping("/retriveAnnouncementByClub/{clubId}")
+	@PreAuthorize("isAuthenticated()")
 	public List<Announcement> retriveAnnouncementByClubId(@PathVariable int clubId) {
 	 return	announcementService.getAnnouncementsByClub(clubId);
 		
@@ -70,6 +72,7 @@ public class AnnouncementController {
 
 
     @GetMapping("/retriveAllAnnouncement")
+    @PreAuthorize("isAuthenticated()")
 	public ResponseEntity<CollectionModel<EntityModel<Announcement>>> retriveAllAnnouncement() {
 		
     	List<Announcement> result=announcementService.getAllAnnouncemnt();
@@ -82,6 +85,7 @@ public class AnnouncementController {
 
 
     @PatchMapping("/{announcementId}/update")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
     public Announcement updateAnnouncement(@Valid @RequestBody RequestAnnouncementUpdateDto dto ,@PathVariable int announcementId) {
     	
     	       return announcementService.updateAnnouncement(announcementId, dto);
@@ -89,6 +93,7 @@ public class AnnouncementController {
 	}
 
     @DeleteMapping("/{announcementId}/{creaatedById}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
 	public ResponseEntity<Void> deleteAnnouncement(@PathVariable int announcementId,@PathVariable long creaatedById  ) {
     	announcementService.deleteAnnouncement(announcementId, creaatedById);
     	return ResponseEntity.noContent().build();
