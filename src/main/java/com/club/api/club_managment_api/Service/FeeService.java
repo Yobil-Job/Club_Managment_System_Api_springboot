@@ -10,9 +10,7 @@ import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Fee;
-import com.club.api.club_managment_api.models.Student;
 import com.club.api.club_managment_api.models.enums.Payment_Status_enum;
-import com.club.api.club_managment_api.models.enums.Role_enum;
 import com.club.api.club_managment_api.repository.FeeRepository;
 
 import jakarta.transaction.Transactional;

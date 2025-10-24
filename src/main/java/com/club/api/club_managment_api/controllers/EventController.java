@@ -3,7 +3,6 @@ package com.club.api.club_managment_api.controllers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import java.beans.Customizer;
 import java.net.URI;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class EventController {
 
 	public EventController(EvenetService evenetService) {
 		this.evenetService = evenetService;
-	}
+	} 
 	
 	@PostMapping("/create")
 	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
@@ -59,7 +58,7 @@ public class EventController {
 	public ResponseEntity<EntityModel<Event>> retriveEventById(@PathVariable int eventId) {
 		Event event=evenetService.getEventById(eventId);
 		EntityModel<Event> e=EntityModel.of(event,
-				linkTo(methodOn(EventController.class).deleteEvent(event.getId(),event.getCreatedBy().getId())).withRel("delete"));
+				linkTo(methodOn(EventController.class).deleteEvent(event.getId(), null)).withRel("delete"));
 		return ResponseEntity.ok(e);
 	}
 	
@@ -83,20 +82,24 @@ public class EventController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PatchMapping("/{eventId}/update/{studentId}")
+	@PatchMapping("/{eventId}/update")
 	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
-	public  Event updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto) {
+	public  Event updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto ,Authentication authentication) {
 		
-		
-		return evenetService.updateEvent(eventId, dto,studentId);
+		CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+		long creatorsId=userDetails.getId();
+		return evenetService.updateEvent(eventId, dto,creatorsId);
 		
 	}
 	
-	@DeleteMapping("/{eventId}/delete/{studentId}")
+	@DeleteMapping("/{eventId}/delete")
 	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
-	public ResponseEntity<Void> deleteEvent(@PathVariable int eventId ,@PathVariable long studentId) {
+	public ResponseEntity<Void> deleteEvent(@PathVariable int eventId , Authentication authentication) {
 		
-		evenetService.deleteEvent(eventId, studentId);
+		CustomUserDetails userDetails=(CustomUserDetails) authentication.getPrincipal();
+		long creatorsId=userDetails.getId();
+		
+		evenetService.deleteEvent(eventId, creatorsId);
 		return ResponseEntity.noContent().build();
 	}
 

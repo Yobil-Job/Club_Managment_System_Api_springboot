@@ -1,6 +1,5 @@
 package com.club.api.club_managment_api.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -97,12 +96,17 @@ public class EvenetService {
 
 	public Event updateEvent(int eventId, RequestEventUpdateDto dto, long createdById) {
 
-	    
+		boolean admins=false;
 	    Event event = eventRepository.findById(eventId)
 	            .orElseThrow(() -> new resourceNotFoundException("Event with id: " + eventId + " not found"));
+	      Role_enum role= studentService.getStudentByIdEntity(createdById).getRole();
+	      
+	      if(role == Role_enum.ADMIN||role == Role_enum.SUPER_ADMIN) {
+	    	  admins=true;
+	      }
 
 	    
-	    if (event.getCreatedBy().getId() != createdById) {
+	    if (event.getCreatedBy().getId() != createdById && !admins) {
 	        throw new notAuthorizedUserException("Only the authority who created the event can edit it");
 	    }
 
@@ -131,11 +135,20 @@ public class EvenetService {
 
 	public void deleteEvent(int eventId, long requesterId) {
 		Event e = getEventById(eventId);
-		if(e.getCreatedBy().getId()==requesterId) {
-			eventRepository.delete(e);
+		boolean admins=false;
+		
+        Role_enum role= studentService.getStudentByIdEntity(requesterId).getRole();
+	      
+	      if(role == Role_enum.ADMIN||role == Role_enum.SUPER_ADMIN) {
+	    	  admins=true;
+	      }
+		
+		if(!(e.getCreatedBy().getId()==requesterId) && !admins) {
+			
+			throw new notAuthorizedUserException("Only the creator of the event can delete it");
 		}
 		else {
-			throw new notAuthorizedUserException("Only the creator of the event can delete it");
+			eventRepository.delete(e);
 		}
 		
 	}
