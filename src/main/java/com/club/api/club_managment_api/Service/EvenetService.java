@@ -57,10 +57,10 @@ public class EvenetService {
 	    if (!hasAuthority) {
 	        throw new notAuthorizedUserException("Only authorities can post events");
 	    }
-
+ 
 	    
 	    Event event = new Event();
-	    Club club = clubService.getClubByIdEntity(dto.getClubId());
+	    Club club = clubService.getClubByIdEntity(dto.getClubId()); 
 	    Student creator = studentService.getStudentByIdEntity(studentId);
 
 	    event.setTitle(dto.getTitle());

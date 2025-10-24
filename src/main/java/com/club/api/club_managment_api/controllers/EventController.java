@@ -3,6 +3,7 @@ package com.club.api.club_managment_api.controllers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.beans.Customizer;
 import java.net.URI;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.club.api.club_managment_api.Service.EvenetService;
+import com.club.api.club_managment_api.config.CustomUserDetails;
 import com.club.api.club_managment_api.dtos.events.RequestEventDto;
 import com.club.api.club_managment_api.dtos.events.RequestEventUpdateDto;
 import com.club.api.club_managment_api.models.Event;
@@ -36,11 +39,13 @@ public class EventController {
 		this.evenetService = evenetService;
 	}
 	
-	@PostMapping("/create/{studentId}")
+	@PostMapping("/create")
 	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
-	public ResponseEntity<EntityModel<Event>> createEvent(@Valid @RequestBody RequestEventDto dto,@PathVariable int studentId) {
+	public ResponseEntity<EntityModel<Event>> createEvent(@Valid @RequestBody RequestEventDto dto ,Authentication authentication) {
 		
-		Event event=evenetService.createEvent(dto, studentId);
+		CustomUserDetails userDetails=(CustomUserDetails) authentication.getPrincipal();
+		long authorityId=userDetails.getId();
+		Event event=evenetService.createEvent(dto, authorityId);
 		EntityModel<Event> e=EntityModel.of(event,
 				linkTo(methodOn(EventController.class).retriveEventById(event.getId())).withSelfRel());
 		URI location=linkTo(methodOn(EventController.class).retriveEventById(event.getId())).toUri();

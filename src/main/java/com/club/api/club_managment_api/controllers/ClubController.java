@@ -181,7 +181,7 @@ public class ClubController {
 		 }else {
 			 clubService.addClubAdmin(memberId, clubId);
 			 return ResponseEntity.ok("Club Admin Assigned Succesfuly");
-		 }
+		 } 
 		 
 	 }
 	
