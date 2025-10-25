@@ -120,7 +120,7 @@ public class StudentController {
 	@PreAuthorize("#id == authentication.principal.id or hasAnyRole('SUPER_ADMIN','ADMIN')")
 	public List<Event> getEventsAttended(@PathVariable long id) {
 
-		return studentService.getEventsAttended(id);
+		return studentService.getEventsAttended(id); 
 
 	}
 
