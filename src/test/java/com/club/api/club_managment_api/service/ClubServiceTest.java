@@ -1,11 +1,13 @@
 package com.club.api.club_managment_api.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import com.club.api.club_managment_api.Service.utilities.StudentMapper;
 import com.club.api.club_managment_api.dtos.clubs.RequestClubDto;
 import com.club.api.club_managment_api.dtos.clubs.ResponseClubDto;
 import com.club.api.club_managment_api.exceptions.DuplicateResourceException;
+import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Student;
 import com.club.api.club_managment_api.repository.ClubRepository;
@@ -89,5 +92,36 @@ class ClubServiceTest {
 
         assertThrows(DuplicateResourceException.class, () -> clubService.createClub(requestDto));
     }
+    
+    @Test
+    void getClubById_ShouldReturnDto_WhenClubExists() {
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+        when(clubMapper.toResponseClubDto(club)).thenReturn(new ResponseClubDto());
+
+        ResponseClubDto result = clubService.getClubById(1);
+
+        assertNotNull(result);
+        verify(clubRepository).findById(1);
+    }
+
+    @Test
+    void getClubById_ShouldThrow_WhenNotFound() {
+        when(clubRepository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(resourceNotFoundException.class, () -> clubService.getClubById(1));
+    }
+
+    @Test
+    void getClubByTitle_ShouldReturnClub_WhenFound() {
+        when(clubRepository.findByTitle("Tech Club")).thenReturn(club);
+        Club result = clubService.getClubByTitle("Tech Club");
+        assertEquals(club, result);
+    }
+
+    @Test
+    void getClubByTitle_ShouldThrow_WhenNotFound() {
+        when(clubRepository.findByTitle("Tech Club")).thenReturn(null);
+        assertThrows(resourceNotFoundException.class, () -> clubService.getClubByTitle("Tech Club"));
+    }
+
 
 }
