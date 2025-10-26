@@ -1,8 +1,11 @@
 package com.club.api.club_managment_api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +26,7 @@ import com.club.api.club_managment_api.dtos.clubs.RequestClubDto;
 import com.club.api.club_managment_api.dtos.clubs.RequestClubDtoFull;
 import com.club.api.club_managment_api.dtos.clubs.ResponseClubDto;
 import com.club.api.club_managment_api.exceptions.DuplicateResourceException;
+import com.club.api.club_managment_api.exceptions.ResourceAlreadyFoundException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Student;
@@ -150,6 +154,47 @@ class ClubServiceTest {
     void deleteClub_ShouldThrow_WhenNotFound() {
         when(clubRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(resourceNotFoundException.class, () -> clubService.deleteClub(1));
+    }
+
+    @Test
+    void addMember_ShouldAdd_WhenNotMember() {
+        when(studentService.getStudentByIdEntity(1)).thenReturn(student);
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+        when(clubRepository.save(any())).thenReturn(club);
+
+        Club result = clubService.addMember(1, 1);
+
+        assertTrue(result.getMembers().contains(student));
+        verify(clubRepository).save(club);
+    }
+
+    @Test
+    void addMember_ShouldThrow_WhenAlreadyMember() {
+        club.getMembers().add(student);
+        when(studentService.getStudentByIdEntity(1)).thenReturn(student);
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+
+        assertThrows(ResourceAlreadyFoundException.class, () -> clubService.addMember(1, 1));
+    }
+
+    @Test
+    void removeMember_ShouldRemove_WhenExists() {
+        club.getMembers().add(student);
+        when(studentService.getStudentByIdEntity(1)).thenReturn(student);
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+        when(clubRepository.save(any())).thenReturn(club);
+
+        Club result = clubService.removeMember(1, 1);
+
+        assertFalse(result.getMembers().contains(student));
+    }
+
+    @Test
+    void removeMember_ShouldThrow_WhenNotMember() {
+        when(studentService.getStudentByIdEntity(1)).thenReturn(student);
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+
+        assertThrows(resourceNotFoundException.class, () -> clubService.removeMember(1, 1));
     }
 
 
