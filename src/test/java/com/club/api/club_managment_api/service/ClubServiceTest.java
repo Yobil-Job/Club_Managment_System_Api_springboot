@@ -20,6 +20,7 @@ import com.club.api.club_managment_api.Service.StudentService;
 import com.club.api.club_managment_api.Service.utilities.ClubMapper;
 import com.club.api.club_managment_api.Service.utilities.StudentMapper;
 import com.club.api.club_managment_api.dtos.clubs.RequestClubDto;
+import com.club.api.club_managment_api.dtos.clubs.RequestClubDtoFull;
 import com.club.api.club_managment_api.dtos.clubs.ResponseClubDto;
 import com.club.api.club_managment_api.exceptions.DuplicateResourceException;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
@@ -121,6 +122,34 @@ class ClubServiceTest {
     void getClubByTitle_ShouldThrow_WhenNotFound() {
         when(clubRepository.findByTitle("Tech Club")).thenReturn(null);
         assertThrows(resourceNotFoundException.class, () -> clubService.getClubByTitle("Tech Club"));
+    }
+
+    @Test
+    void updateClub_ShouldModifyFields() {
+        RequestClubDtoFull updateDto = new RequestClubDtoFull();
+        updateDto.setTitle("New Club");
+        updateDto.setDescription("Updated desc");
+
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+
+        clubService.updateClub(1, updateDto);
+
+        assertEquals("New Club", club.getTitle());
+        assertEquals("Updated desc", club.getDescription());
+        verify(clubRepository).save(club);
+    }
+
+    @Test
+    void deleteClub_ShouldRemove_WhenExists() {
+        when(clubRepository.findById(1)).thenReturn(Optional.of(club));
+        clubService.deleteClub(1);
+        verify(clubRepository).delete(club);
+    }
+
+    @Test
+    void deleteClub_ShouldThrow_WhenNotFound() {
+        when(clubRepository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(resourceNotFoundException.class, () -> clubService.deleteClub(1));
     }
 
 
