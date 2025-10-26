@@ -196,6 +196,8 @@ class ClubServiceTest {
 
         assertThrows(resourceNotFoundException.class, () -> clubService.removeMember(1, 1));
     }
+    
+    
 
 
 }
