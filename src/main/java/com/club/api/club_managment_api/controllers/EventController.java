@@ -83,8 +83,8 @@ public class EventController {
 	}
 
 	@PatchMapping("/{eventId}/update")
-	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
-	public  Event updateEvent(@PathVariable int eventId, @PathVariable long studentId,@RequestBody 	RequestEventUpdateDto dto ,Authentication authentication) {
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
+	public  Event updateEvent(@PathVariable int eventId,@RequestBody 	RequestEventUpdateDto dto ,Authentication authentication) {
 		
 		CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
 		long creatorsId=userDetails.getId();
@@ -93,7 +93,7 @@ public class EventController {
 	}
 	
 	@DeleteMapping("/{eventId}/delete")
-	@PreAuthorize("hasAnyRole('SUPER_ADMI','ADMIN','SUPER_USER')")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
 	public ResponseEntity<Void> deleteEvent(@PathVariable int eventId , Authentication authentication) {
 		
 		CustomUserDetails userDetails=(CustomUserDetails) authentication.getPrincipal();

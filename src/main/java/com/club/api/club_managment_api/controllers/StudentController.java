@@ -4,12 +4,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -47,6 +50,38 @@ public class StudentController {
 		this.studentClubRepository = studentClubRepository;
 		this.clubService=clubService;
 	}
+	
+	@GetMapping("/me")
+	public ResponseEntity<Map<String, Object>> me(Authentication authentication) {
+	    
+	    com.club.api.club_managment_api.config.CustomUserDetails userDetails = 
+	        (com.club.api.club_managment_api.config.CustomUserDetails) authentication.getPrincipal();
+	    
+	    
+	    com.club.api.club_managment_api.models.Student student = userDetails.getStudent();
+	    
+	  
+	    Map<String, Object> response = new HashMap<>();
+	    
+	    
+	    response.put("id", student.getId());
+	    response.put("email", student.getEmail());
+	    response.put("firstname", student.getFirstname());
+	    response.put("lastname", student.getLastname());
+	    response.put("gender", student.getGender());
+	    response.put("yearOfStay", student.getYearOfStay());
+	    response.put("role", student.getRole());
+	    response.put("department", student.getDepartment());
+	    
+	 
+	    response.put("name", authentication.getName()); // email
+	    response.put("authorities", authentication.getAuthorities());
+	    
+	
+	    
+	    return ResponseEntity.ok(response);
+	}
+
 
 	@PostMapping("/register")
 	public ResponseEntity<EntityModel<StudentResponseDto>> registerStudentGlobal(
