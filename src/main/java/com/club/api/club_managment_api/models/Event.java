@@ -38,7 +38,7 @@ public class Event {
 	
 	@NotBlank
 	@Column(name = "title",nullable = false)
-	@Length(min = 30,max = 200)
+	@Length(min = 10,max = 100)
 	private String title;
 	
 	
