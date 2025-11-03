@@ -55,6 +55,9 @@ public class AuthController {
 	            student.getRole().name()
 	    );
 
+	    
+	    refreshTokenService.deleteByStudentId(student.getId());
+	    
 	    RefreshToken refreshToken = refreshTokenService.createRefreshToken(student.getId());
 
 	    return ResponseEntity.ok(
