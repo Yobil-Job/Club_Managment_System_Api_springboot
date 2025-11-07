@@ -69,8 +69,9 @@ public class ClubController {
 		
 	}
 
-	@GetMapping("/{id}")
-	@PreAuthorize("#id == authentication.principal or hasAnyRole('SUPER_ADMIN','ADMIN')")
+
+    @GetMapping("/{id}")
+   @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','STUDENT')")
 	public ResponseEntity<EntityModel<ResponseClubDto>> retriveClubById(@PathVariable int id) {
 		ResponseClubDto club = clubService.getClubById(id);
 		EntityModel<ResponseClubDto> response=EntityModel.of(club,
@@ -79,8 +80,8 @@ public class ClubController {
 	}
 	
 	
-	@GetMapping("all-clubs")
-	@PreAuthorize("#id == authentication.principal or hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @GetMapping("all-clubs")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','STUDENT')")
 	public ResponseEntity<CollectionModel<EntityModel<ResponseClubDto>>> retriveAllClubs() {
 		
 		List<EntityModel<ResponseClubDto>> e=clubService.getAllClubs().stream()

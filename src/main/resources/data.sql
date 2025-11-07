@@ -12,13 +12,13 @@ VALUES
 ('Cyber Security Club', 'A student club focusing on ethical hacking, network defense, and cybersecurity awareness.', 'https://example.com/logos/cyber.png', 'Sport', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('AI and Robotics Society', 'A club dedicated to AI research, robotics projects, and innovation challenges.', 'https://example.com/logos/robotics.png', 'Creative', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-/*INSERT INTO STUDENT_CLUB (CLUB_ID, STUDENT_ID) VALUES
+INSERT INTO STUDENT_CLUB (STUDENT_ID,CLUB_ID) VALUES
 (1, 1),
 (1, 2),
 (1, 3),
 (2, 1),
 (3, 2),
-(4, 3);*/
+(4, 3);
 
 
 ALTER TABLE student_club ADD COLUMN status VARCHAR(20);
@@ -50,4 +50,30 @@ INSERT INTO students (
     'SUPER_ADMIN',
     'First_Year'
 );
+
+INSERT INTO students (
+    email,
+    first_name,
+    last_name,
+    gender,
+    password,
+    role,
+    year_of_stay
+) VALUES (
+   'mlolai@example.com',
+    'mola',
+    'dawit',
+    'MALE', 
+    '$2a$10$x2NcTWwKXHiWzOvJlbeU4uLph3LH8VurkxQez0f93JU6VvMZpF2tW',
+    'ADMIN',
+    'First_Year'
+);
+
+insert into student_club(club_id,student_id,status)values
+(3,7,null);
+
+
+
+
+
 
