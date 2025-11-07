@@ -65,12 +65,21 @@ INSERT INTO students (
     'dawit',
     'MALE', 
     '$2a$10$x2NcTWwKXHiWzOvJlbeU4uLph3LH8VurkxQez0f93JU6VvMZpF2tW',
-    'ADMIN',
+    'SUPER_USER',
     'First_Year'
 );
 
 insert into student_club(club_id,student_id,status)values
 (3,7,null);
+
+
+
+INSERT INTO AUTHORITY (AUTHORITY_ID, END_DATE, NAME, START_DATE, CLUB_ID, STUDENT_ID)
+VALUES (1000, NULL, 'President', '2024-01-15', 3, 4);
+
+ 
+INSERT INTO AUTHORITY (AUTHORITY_ID, END_DATE, NAME, START_DATE, CLUB_ID, STUDENT_ID)
+VALUES (1001, '2024-12-31', 'Vice President', '2024-01-15', 3, 7);
 
 
 
