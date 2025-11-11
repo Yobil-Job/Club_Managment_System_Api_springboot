@@ -36,6 +36,9 @@ public class StudentResponseDto {
 	
 	@NotNull(message = "Role is required")
 	private Role_enum role;
+	
+	@Length(min = 3, max = 50)
+	private String department;
 
 	public long getId() {
 		return id;
@@ -91,6 +94,14 @@ public class StudentResponseDto {
 
 	public void setRole(Role_enum role) {
 		this.role = role;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
 	}
 
 }

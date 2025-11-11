@@ -41,6 +41,7 @@ public class StudentMapper {
 		d.setYearOfStay(s.getYearOfStay());
 		d.setGender(s.getGender());
 		d.setRole(s.getRole()); // Include role field from Student entity
+		d.setDepartment(s.getDepartment()); // Include department field from Student entity
 		return d;
 	}
 
