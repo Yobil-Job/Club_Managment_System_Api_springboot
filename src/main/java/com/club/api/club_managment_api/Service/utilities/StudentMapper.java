@@ -40,6 +40,7 @@ public class StudentMapper {
 		d.setEmail(s.getEmail());
 		d.setYearOfStay(s.getYearOfStay());
 		d.setGender(s.getGender());
+		d.setRole(s.getRole()); // Include role field from Student entity
 		return d;
 	}
 

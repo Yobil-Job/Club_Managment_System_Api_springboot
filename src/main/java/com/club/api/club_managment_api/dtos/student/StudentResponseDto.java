@@ -3,6 +3,7 @@ package com.club.api.club_managment_api.dtos.student;
 import org.hibernate.validator.constraints.Length;
 
 import com.club.api.club_managment_api.models.enums.Gender_enum;
+import com.club.api.club_managment_api.models.enums.Role_enum;
 import com.club.api.club_managment_api.models.enums.Year_Of_Stay_enum;
 
 import jakarta.persistence.Id;
@@ -33,7 +34,8 @@ public class StudentResponseDto {
 	@NotNull(message = "Year of stay is required")
 	private Year_Of_Stay_enum yearOfStay;
 	
-	
+	@NotNull(message = "Role is required")
+	private Role_enum role;
 
 	public long getId() {
 		return id;
@@ -81,6 +83,14 @@ public class StudentResponseDto {
 
 	public void setYearOfStay(Year_Of_Stay_enum yearOfStay) {
 		this.yearOfStay = yearOfStay;
+	}
+
+	public Role_enum getRole() {
+		return role;
+	}
+
+	public void setRole(Role_enum role) {
+		this.role = role;
 	}
 
 }
