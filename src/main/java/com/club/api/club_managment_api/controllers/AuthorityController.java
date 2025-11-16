@@ -10,6 +10,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.club.api.club_managment_api.Service.AuthorityService;
+import com.club.api.club_managment_api.config.CustomUserDetails;
 import com.club.api.club_managment_api.dtos.authorities.RequestAuthorityDto;
 import com.club.api.club_managment_api.dtos.authorities.RequestAuthorityUpdateDto;
 import com.club.api.club_managment_api.exceptions.resourceNotFoundException;
@@ -110,14 +112,31 @@ public class AuthorityController {
 	}
 	
 	@GetMapping("/students/{studentId}")
-	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
-	public ResponseEntity<CollectionModel<EntityModel<Authority>>> getAuthoritiesByStudent(@PathVariable long studentId) {
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','SUPER_USER')")
+	public ResponseEntity<CollectionModel<EntityModel<Authority>>> getAuthoritiesByStudent(@PathVariable long studentId, Authentication authentication) {
+		// Security check: SUPER_USER can only get their own authorities
+		if (authentication != null) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			String userRole = userDetails.getAuthorities().stream()
+					.map(auth -> auth.getAuthority())
+					.findFirst()
+					.orElse("");
+			
+			// If user is SUPER_USER, ensure they can only access their own authorities
+			if (userRole.equals("ROLE_SUPER_USER") || userRole.equals("SUPER_USER")) {
+				long currentUserId = userDetails.getId();
+				if (currentUserId != studentId) {
+					throw new resourceNotFoundException("SUPER_USER can only access their own authorities");
+				}
+			}
+		}
+		
 		List<Authority> authorities= authorityService.getAuthoritiesByStudent(studentId);
 		List<EntityModel<Authority>> e=authorities.stream().map(a->EntityModel.of(a,
 				linkTo(methodOn(AuthorityController.class).retriveAuthorityById(a.getId())).withSelfRel())).toList();
 		
 		CollectionModel<EntityModel<Authority>> response=CollectionModel.of(e,
-				linkTo(methodOn(AuthorityController.class).getAuthoritiesByStudent(studentId)).withSelfRel());
+				linkTo(methodOn(AuthorityController.class).getAuthoritiesByStudent(studentId, authentication)).withSelfRel());
 		return ResponseEntity.ok(response);
 		
 		

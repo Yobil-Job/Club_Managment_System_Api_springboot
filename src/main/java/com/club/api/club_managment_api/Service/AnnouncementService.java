@@ -67,10 +67,11 @@ public class AnnouncementService {
 		Long studentId = dto.getCreatedById();
         Integer clubId = dto.getClubId();
         boolean hasAuthority=authorityRepository.existsByStudentIdAndClubId(studentId, clubId);
+        boolean hasAdminAccess = checkPortalAdminAccess(studentId, clubId);
         
 
-        if (!hasAuthority) {
-            throw new IllegalArgumentException("You must have authority in this club to create announcements.");
+        if (!hasAuthority && !hasAdminAccess) {
+            throw new IllegalArgumentException("You must have authority in this club or be a club admin to create announcements.");
         }
         else {
         	 Student student = studentRepository.findById(studentId)

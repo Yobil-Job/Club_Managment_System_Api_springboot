@@ -53,8 +53,10 @@ public class EvenetService {
 	    
 	    
 	    boolean hasAuthority = authorityRepository.existsByStudentIdAndClubId(studentId, dto.getClubId());
-	    if (!hasAuthority) {
-	        throw new notAuthorizedUserException("Only authorities can post events");
+	    boolean hasAdminAccess = checkPortalAdminAccess((int)studentId, dto.getClubId());
+	    
+	    if (!hasAuthority && !hasAdminAccess) {
+	        throw new notAuthorizedUserException("You must have authority in this club or be a club admin to create events");
 	    }
  
 	    
