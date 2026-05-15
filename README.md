@@ -535,17 +535,6 @@ This project showcases expertise in:
 - CI/CD pipeline readiness
 
 ---
-
-## 🐛 Known Issues & Fixes
-
-### Lazy Loading in `/student/me` Endpoint
-A fix document is provided: [FIX_STUDENT_ME_ENDPOINT.md](./FIX_STUDENT_ME_ENDPOINT.md)
-
-**Issue**: Lazy-loaded collections cause serialization errors.  
-**Solution**: Cast to `CustomUserDetails` and manually build response DTO.
-
----
-
 ## 📈 Future Enhancements
 
 - [ ] Caching layer (Redis) for frequently accessed data
