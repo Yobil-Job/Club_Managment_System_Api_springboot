@@ -119,7 +119,7 @@ docker run -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/club_db -e SPRING_
 
 ---
 
-## Where to look in the code (interview guide)
+## Where to look in the code 
 
 - Entry point: `src/main/java/com/club/api/club_managment_api/ClubManagmentApiApplication.java`
 - Controllers: `controllers/` (ClubController, EventController, etc.)
@@ -130,23 +130,15 @@ docker run -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/club_db -e SPRING_
 
 ---
 
-## Contact / Next steps
+## Contact 
 
 Developer: Eyob — Software Engineer
 - GitHub: https://github.com/Yobil-Job
-- LinkedIn: (add your LinkedIn URL)
+- LinkedIn: https://www.linkedin.com/in/eyob-weldetensay-a68160254/
 
-If you want, I can:
-- Produce a one-page project summary for your resume
-- Export Postman collection for core endpoints
-- Add CI/CD pipeline (GitHub Actions) with tests and image build
-
----
 
 ## License
 
 MIT — see LICENSE file.
 
----
 
-_Last updated: 2026-05-15_
