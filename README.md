@@ -26,22 +26,16 @@ A **full-stack REST API** built with Spring Boot 3.5.5 and Java 21 for managing 
 
 ---
 
-## 🏗️ Architecture at a Glance
+## 🏗️ System Architecture
 
-```
-┌─────────────────┐
-│   Controllers   │ (Endpoint routing & validation)
-├─────────────────┤
-│    Services     │ (Business logic & authorization)
-├─────────────────┤
-│  Repositories   │ (JPA data access)
-├─────────────────┤
-│    Database     │ (MySQL/PostgreSQL/H2)
-└─────────────────┘
+![Club Management System Architecture](./club-archtecture.png)
 
-🔐 Security Layer: JWT + Spring Security + Role-Based Access Control (@PreAuthorize)
-📊 HATEOAS: Hypermedia links for RESTful navigation
-```
+**Architecture Overview:**
+- **Controllers** → REST endpoint routing & validation
+- **Services** → Business logic, authorization checks, and transactions
+- **Repositories** → JPA data access abstraction layer
+- **Database** → MySQL/PostgreSQL/H2 persistent storage
+- **Security Layer** → JWT + Spring Security + Role-Based Access Control
 
 ---
 
@@ -127,12 +121,14 @@ POST   /student/{studentId}/clubs/{clubId}/request → Join club (creates pendin
 ```
 POST   /clubs/create                                → Create new club
 GET    /clubs/{clubId}                              → Get club details
-GET    /clubs                                       → List all clubs
+GET    /clubs/all-clubs                             → List all clubs
 PATCH  /clubs/{id}/update                           → Update club info
 DELETE /clubs/{id}/delete                           → Delete club
 GET    /clubs/{clubId}/requests/pending             → Get pending join requests
 PATCH  /clubs/{clubId}/requests/{studentId}/approve → Approve join request
 PATCH  /clubs/{clubId}/requests/{studentId}/reject  → Reject join request
+GET    /clubs/{clubId}/get-members                  → List club members
+PATCH  /clubs/{clubId}/assign-clubAdmin/{memberId}  → Assign member as club admin
 ```
 
 ### 🎖️ **Authority Management** (`/authorities`)
@@ -176,12 +172,12 @@ DELETE /news/{id}/delete                    → Delete news post
 
 ### 💰 **Fees** (`/fees`)
 ```
-POST   /fees/create                         → Create fee entry
+POST   /fees/clubs/{clubId}/fees/students/{studentId} → Create fee entry
 GET    /fees/{feeId}                        → Get fee details
 GET    /fees/club/{clubId}                  → List fees by club
 GET    /fees/clubs/{clubId}/total           → Get total fees collected by club
-PATCH  /fees/{feeId}/update                 → Update fee status (PAID, PENDING, FAILED)
-DELETE /fees/{feeId}/delete                 → Delete fee entry
+PATCH  /fees/{feeId}/status                 → Update fee status (PAID, PENDING, FAILED)
+GET    /fees/students/{studentId}           → List student's fees
 ```
 
 ---
@@ -232,8 +228,6 @@ curl -X POST http://localhost:8080/auth/login \
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "studentId": 1,
-  "email": "student@university.edu",
   "role": "STUDENT"
 }
 ```
@@ -246,8 +240,7 @@ curl -X POST http://localhost:8080/announcements/create \
   -d '{
     "clubId": 2,
     "title": "Weekly Meetup - Cloud Architecture",
-    "description": "Join us for a deep dive into AWS microservices patterns",
-    "createdById": 5
+    "description": "Join us for a deep dive into AWS microservices patterns"
   }'
 ```
 
@@ -261,21 +254,21 @@ curl -X POST http://localhost:8080/events/create \
     "title": "Tech Conference 2025",
     "description": "Annual technology conference",
     "eventDate": "2025-06-15T10:00:00",
-    "location": "Main Hall",
-    "createdById": 5
+    "location": "Main Hall"
   }'
 ```
 
 ### 💰 Track Fee Payments
 ```bash
-curl -X PATCH http://localhost:8080/fees/{feeId}/update \
+# Update fee status
+curl -X PATCH http://localhost:8080/fees/{feeId}/status \
   -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
     "status": "PAID"
   }'
 
-# Get total collected
+# Get total collected by club
 curl http://localhost:8080/fees/clubs/{clubId}/total \
   -H "Authorization: Bearer <ACCESS_TOKEN>"
 ```
@@ -298,16 +291,13 @@ curl http://localhost:8080/fees/clubs/{clubId}/total \
 | **Stateless Design** | No session storage; JWT carries all auth info |
 
 ### 📝 Security Configuration
-```java
-// src/main/java/com/club/api/club_managment_api/config/SecurityConfig.java
-- HttpSecurity configuration with JWT filters
-- CORS settings for API access
-- Endpoint-level security rules
-
-// src/main/java/com/club/api/club_managment_api/config/JwtUtil.java
-- Token generation with configurable expiration
-- Token validation & claim extraction
-- Signature verification with HMAC-SHA256
+```
+src/main/java/com/club/api/club_managment_api/config/
+├── SecurityConfig.java          # HttpSecurity & endpoint protection
+├── JwtUtil.java                 # Token generation & validation
+├── JwtAuthenticationFilter.java  # JWT extraction & validation
+├── CustomUserDetails.java        # Principal object carrying user info
+└── CustomUserDetailsService.java # Load user from database
 ```
 
 ---
