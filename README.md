@@ -12,7 +12,7 @@ Enterprise-ready REST API implementing RBAC, JWT security, and an extensible mod
 
 ---
 
-## Why this project matters (for employers)
+## Why this project matters
 
 - Production-minded: clear separation of concerns, JWT security, input validation, and testable services.
 - Scalable: designed for RDBMS (MySQL/Postgres) with easy migration to caching/queues.
@@ -22,7 +22,7 @@ Enterprise-ready REST API implementing RBAC, JWT security, and an extensible mod
 
 ## Architecture
 
-![Club Architecture](./club-architecture.png)
+![Club Architecture](./club-archtecture.png)
 
 High-level: Controllers → Services → Repositories → Database. JWT-based auth, method-level authorization (@PreAuthorize) and OpenAPI docs.
 
