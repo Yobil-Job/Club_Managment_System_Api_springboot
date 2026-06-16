@@ -66,7 +66,7 @@ public class NewsService {
 		News news = newsRepository.findById(newsId)
 				.orElseThrow(() -> new resourceNotFoundException("No news found with id: " + newsId));
 		
-		if (!news.getCreatedBy().getId().equals(requesterId)) {
+		if (news.getCreatedBy().getId() != requesterId) {
 			throw new notAuthorizedUserException("Only the creator of the news can edit it");
 		}
 		
@@ -92,7 +92,7 @@ public class NewsService {
 		News news = newsRepository.findById(newsId)
 				.orElseThrow(() -> new resourceNotFoundException("News with id: " + newsId + " not found"));
 		
-		if (!news.getCreatedBy().getId().equals(requesterId)) {
+		if (news.getCreatedBy().getId() != requesterId) {
 			throw new notAuthorizedUserException("Only the creator of the news can delete it");
 		}
 		

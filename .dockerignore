@@ -1,0 +1,9 @@
+target/
+.git/
+.gitattributes
+.gitignore
+.mvn/
+README.md
+club-archtecture.png
+mvnw
+mvnw.cmd

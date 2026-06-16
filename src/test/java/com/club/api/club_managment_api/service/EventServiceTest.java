@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import com.club.api.club_managment_api.Service.ClubService;
 import com.club.api.club_managment_api.Service.EvenetService;
 import com.club.api.club_managment_api.Service.StudentService;
+import com.club.api.club_managment_api.exceptions.notAuthorizedUserException;
 import com.club.api.club_managment_api.dtos.events.RequestEventDto;
 import com.club.api.club_managment_api.models.Club;
 import com.club.api.club_managment_api.models.Event;
@@ -91,11 +92,12 @@ public class EventServiceTest {
         dto.setDescription("Should fail because student is not an authority");
 
         when(authorityRepository.existsByStudentIdAndClubId(1L, 1)).thenReturn(false);
+        when(studentService.getStudentByIdEntity(1L)).thenReturn(student);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(notAuthorizedUserException.class, () -> {
             eventService.createEvent(dto, 1L);
         });
 
-        assertTrue(exception.getMessage().contains("Only authorities can post events"));
+        assertTrue(exception.getMessage().contains("You must have authority in this club or be a club admin to create events"));
     }
 }
