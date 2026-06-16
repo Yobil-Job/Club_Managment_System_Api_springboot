@@ -46,6 +46,7 @@ public class Announcement {
 	private LocalDateTime createdAt;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "created_by", nullable = false)
 	@JsonIgnore
 	private Student createdBy;
 	
