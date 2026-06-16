@@ -2,8 +2,10 @@ package com.club.api.club_managment_api.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,6 +30,9 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    @Value("${cors.origins:http://localhost:5173,http://localhost:3000}")
+    private String corsOrigins;
+
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                           CustomAccessDeniedHandler customAccessDeniedHandler) {
@@ -50,6 +55,7 @@ public class SecurityConfig {
                     .accessDeniedHandler(customAccessDeniedHandler)
             )
             .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers(
                             "/student/register**",
                             "/auth/**",
@@ -99,17 +105,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        String allowedOrigins = System.getenv("CORS_ORIGINS");
-        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
-            configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
-        } else {
-            configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:8080",
-                "http://localhost:8081",
-                "http://localhost:5173"
-            ));
-        }
+        configuration.setAllowedOrigins(List.of(corsOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

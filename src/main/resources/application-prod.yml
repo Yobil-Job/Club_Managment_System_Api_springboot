@@ -25,6 +25,9 @@ spring:
 server:
   port: ${PORT:8080}
 
+cors:
+  origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+
 logging:
   level:
     root: WARN
